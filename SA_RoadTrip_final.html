@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a1208">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SA Road Trip">
+<title>South Africa Road Trip</title>
+<style>
+:root{--bg:#0f0d08;--bg2:#1a1610;--bg3:#252018;--bg4:#2e2820;--border:#3a3228;--gold:#c9a84c;--gold2:#e8c97a;--text:#e8e0d4;--text2:#a89e92;--text3:#6e6560;--green:#4caf6e;--red:#c45c4c;--blue:#4c8ec4;--radius:12px;--radius-sm:8px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;overflow-x:hidden}
+.top-header{background:linear-gradient(135deg,#1a1208,#2a1e0c 50%,#1a1208);padding:16px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.top-header h1{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.subtitle{font-size:11px;color:var(--text3);margin-top:2px}
+.trip-dates{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.badge{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--gold2)}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;cursor:pointer;border:none;background:none;color:var(--text3);font-size:10px;gap:4px}
+.nav-btn.active{color:var(--gold)}
+.nav-icon{font-size:20px;line-height:1}
+.screen{display:none;padding:16px}
+.screen.active{display:block}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.stitle{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.stitle::after{content:'';flex:1;height:1px;background:var(--border)}
+.day-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
+.dch{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.day-badge{background:var(--gold);color:var(--bg);font-size:10px;font-weight:800;padding:4px 8px;border-radius:20px;white-space:nowrap}
+.day-badge.t{background:var(--red)}
+.di{flex:1}
+.dn{font-size:14px;font-weight:700}
+.dd{font-size:11px;color:var(--text2);margin-top:1px}
+.da{color:var(--text3);font-size:16px;transition:transform .2s}
+.day-card.open .da{transform:rotate(90deg)}
+.dcb{display:none;padding:0 16px 16px;border-top:1px solid var(--border)}
+.day-card.open .dcb{display:block}
+.ir{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.ir:last-child{border-bottom:none}
+.il{font-size:11px;color:var(--text3);min-width:80px;padding-top:1px}
+.iv{font-size:13px;color:var(--text);flex:1;line-height:1.5}
+.warn{background:rgba(196,89,76,.1);border:1px solid rgba(196,89,76,.3);border-radius:var(--radius-sm);padding:10px 12px;margin:8px 0;font-size:12px;color:#e07060;line-height:1.5}
+.info{background:rgba(76,142,196,.1);border:1px solid rgba(76,142,196,.3);border-radius:var(--radius-sm);padding:10px 12px;margin:8px 0;font-size:12px;color:#70a8d8;line-height:1.5}
+.shop{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:var(--radius-sm);padding:10px 12px;margin:8px 0;font-size:12px;color:var(--gold2);line-height:1.6}
+.moon{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);border-radius:var(--radius-sm);padding:10px 12px;margin:8px 0;font-size:12px;color:var(--gold2);line-height:1.5}
+.tc{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin:10px 0}
+.ts{display:flex;gap:12px;margin:6px 0}
+.tsv{font-size:15px;font-weight:800;color:var(--gold2);display:block}
+.tsl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block}
+.tr2{font-size:11px;color:var(--text3);line-height:1.6;margin:4px 0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.chip{background:var(--bg4);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--text2)}
+.al{margin:10px 0}
+.ai{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.ai:last-child{border-bottom:none}
+.at{font-size:11px;color:var(--gold);font-weight:700;min-width:60px;padding-top:2px}
+.ac{flex:1}
+.an{font-size:13px;font-weight:600}
+.ano{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4}
+.adur{font-size:10px;color:var(--text3);margin-top:2px}
+.hcard{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin:10px 0}
+.hn{font-size:14px;font-weight:700;margin-bottom:6px}
+.hr{display:flex;gap:8px;font-size:12px;color:var(--text2);margin:3px 0;align-items:flex-start}
+.hr span:first-child{min-width:18px;text-align:center}
+.lb{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--gold2);text-decoration:none;margin:4px 4px 4px 0;cursor:pointer}
+.lb.r{background:rgba(196,89,76,.15);border-color:rgba(196,89,76,.4);color:#e07060}
+.ri{padding:8px 0;border-bottom:1px solid var(--border)}
+.ri:last-child{border-bottom:none}
+.rn{font-size:13px;font-weight:700}
+.rd{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.4}
+.rt{margin-top:5px;display:flex;flex-wrap:wrap;gap:4px}
+.tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;margin:2px}
+.tg{background:rgba(76,175,110,.15);color:var(--green);border:1px solid rgba(76,175,110,.3)}
+.ti{background:rgba(76,142,196,.15);color:var(--blue);border:1px solid rgba(76,142,196,.3)}
+.mi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;cursor:pointer}
+.mi.checked{border-color:var(--green);background:rgba(76,175,110,.05)}
+.mh{display:flex;align-items:center;gap:12px}
+.mc{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.mi.checked .mc{background:var(--green);border-color:var(--green);color:#fff}
+.mco{flex:1}
+.mn{font-size:14px;font-weight:700}
+.mm{font-size:11px;color:var(--text2);margin-top:3px}
+.ms{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.sr{background:rgba(76,175,110,.2);color:var(--green)}
+.st{background:rgba(201,168,76,.2);color:var(--gold)}
+.so{background:rgba(110,101,96,.3);color:var(--text3)}
+.md{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.mi.expanded .md{display:block}
+.mdesc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px}
+.es{margin-bottom:20px}
+.li{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px}
+.lih{display:flex;align-items:center;gap:10px;cursor:pointer}
+.le{font-size:22px;width:32px;text-align:center;flex-shrink:0}
+.lin{flex:1}
+.lname{font-size:14px;font-weight:700}
+.ltype{font-size:11px;color:var(--text3);margin-top:2px}
+.larr{color:var(--text3);font-size:14px;transition:transform .2s}
+.li.open .larr{transform:rotate(90deg)}
+.lib{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.li.open .lib{display:block}
+.ldesc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+.lmeta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.lmc{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--text2)}
+.bt{background:linear-gradient(135deg,#2a1e0c,#1a1208);border:1px solid var(--gold);border-radius:var(--radius);padding:20px;margin-bottom:16px;text-align:center}
+.btl{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--gold)}
+.btv{font-size:36px;font-weight:800;color:var(--gold2);margin:6px 0}
+.bts{font-size:12px;color:var(--text3)}
+table.bt2{width:100%;border-collapse:collapse}
+table.bt2 tr{border-bottom:1px solid var(--border)}
+table.bt2 tr:last-child{border-bottom:none}
+table.bt2 td{padding:10px 0;font-size:13px}
+table.bt2 td:last-child{text-align:right;color:var(--gold2);font-weight:700}
+.sub{font-size:11px;color:var(--text3);display:block}
+.cv{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:12px}
+.cvr{display:flex;gap:10px;align-items:center;margin-top:10px}
+.cvi{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;color:var(--text);font-size:16px;font-weight:700;outline:none;-webkit-appearance:none}
+.cvi:focus{border-color:var(--gold)}
+.cvl{font-size:12px;color:var(--text3);min-width:35px}
+.cvres{font-size:18px;font-weight:800;color:var(--gold2);min-width:80px;text-align:right}
+.ps{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+.ph{padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.phi{font-size:20px}
+.pht{flex:1;font-size:14px;font-weight:700}
+.pha{color:var(--text3);font-size:14px;transition:transform .2s}
+.ps.open .pha{transform:rotate(90deg)}
+.pb{display:none;padding:0 16px 16px;border-top:1px solid var(--border)}
+.ps.open .pb{display:block}
+.ci{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ci:last-child{border-bottom:none}
+.cinfo{flex:1}
+.cn{font-size:13px;font-weight:700}
+.cnum{font-size:12px;color:var(--text2);margin-top:2px}
+.cbtn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;color:var(--green);font-size:12px;font-weight:700;text-decoration:none}
+.urg{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--red);border:none;border-radius:var(--radius);padding:16px;color:#fff;font-size:16px;font-weight:800;text-decoration:none;width:100%;margin-bottom:12px;cursor:pointer}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.mch{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px}
+.mchl{font-size:11px;color:var(--text3);margin-bottom:4px}
+.mcht{font-size:15px;font-weight:800;color:var(--gold2)}
+.mchd{font-size:11px;color:var(--text2);margin-top:2px}
+.sb{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text);font-size:14px;width:100%;outline:none;margin-bottom:14px;-webkit-appearance:none}
+.sb::placeholder{color:var(--text3)}
+.sb:focus{border-color:var(--gold)}
+.fr{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+.fr::-webkit-scrollbar{display:none}
+.fp{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2);white-space:nowrap;cursor:pointer}
+.fp.active{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:700}
+.empty{text-align:center;padding:20px;color:var(--text3);font-size:12px}
+.ar{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.ar:last-child{border-bottom:none}
+.ae{font-size:11px;color:var(--gold);font-weight:700;min-width:100px;padding-top:1px}
+.av{flex:1;font-size:12px;color:var(--text2);line-height:1.5}
+
+</style>
+</head>
+<body>
+
+<div class="top-header">
+  <h1>🌍 South Africa Road Trip</h1>
+  <div class="subtitle">Sadok &amp; Fatma · 16 nuits · Hiver austral</div>
+  <div class="trip-dates">
+    <span class="badge">✈️ 23 juin → 10 juil 2026</span>
+    <span class="badge">🚗 Toyota Urban Cruiser</span>
+    <span class="badge">📋 PNR VAYSDU</span>
+  </div>
+</div>
+
+<div id="screen-planning" class="screen active">
+<div class="stitle">Aperçu du voyage</div>
+
+<!-- J0 -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge">J0</div><div class="di"><div class="dn">✈️ Vol Tunis → Cape Town</div><div class="dd">Lundi 23 juin 2026</div></div><div class="da">›</div></div>
+<div class="dcb"><div class="al">
+<div class="ai"><div class="at">17h15</div><div class="ac"><div class="an">TK664 · Tunis-Carthage → Istanbul</div><div class="ano">Airbus A321neo · Economy · Repas</div><div class="adur">⏱ 4h50</div></div></div>
+<div class="ai"><div class="at">22h05</div><div class="ac"><div class="an">Escale Istanbul IST</div><div class="ano">3h40 · Pas de récupération bagages</div><div class="adur">⏱ 3h40</div></div></div>
+<div class="ai"><div class="at">01h45 (+1)</div><div class="ac"><div class="an">TK044 · Istanbul → Cape Town</div><div class="ano">Airbus A350 XWB · Economy · Repas</div><div class="adur">⏱ 10h05</div></div></div>
+</div>
+<div class="ir"><div class="il">PNR</div><div class="iv"><strong>VAYSDU</strong> · Turkish Airlines</div></div>
+<div class="ir"><div class="il">Tickets</div><div class="iv">235-7473961411 / 235-7473961410</div></div>
+</div></div>
+
+<!-- J1 -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge">J1</div><div class="di"><div class="dn">🛬 Arrivée Cape Town · Stellenbosch</div><div class="dd">Mardi 24 juin 2026</div></div><div class="da">›</div></div>
+<div class="dcb">
+<div class="tc"><strong>🚗 CPT Airport → Stellenbosch</strong><div class="ts"><div><span class="tsv">40.7 km</span><span class="tsl">Distance</span></div><div><span class="tsv">41 min</span><span class="tsl">Durée</span></div><div><span class="tsv">~14h15</span><span class="tsl">Arrivée</span></div></div><div class="tr2">N2 → R300 → M23 → R44</div><div class="chips"><span class="chip">⏰ Départ ~13h45</span></div><a class="lb" href="https://maps.app.goo.gl/ueGBKR3z6n6hJM9P7" target="_blank">🗺️ Maps</a></div>
+<div class="al">
+<div class="ai"><div class="at">11h50</div><div class="ac"><div class="an">🛬 Atterrissage CPT</div><div class="ano">Immigration + bagages</div><div class="adur">⏱ ~1h</div></div></div>
+<div class="ai"><div class="at">~12h30</div><div class="ac"><div class="an">💵 Retrait DAB · Aéroport CPT</div><div class="ano">6 000-7 000 ZAR (~325-350€) · Boursorama Visa · DAB dans le terminal</div><div class="adur">⏱ 15min</div></div></div>
+<div class="ai"><div class="at">13h30</div><div class="ac"><div class="an">🚗 Prise en charge Woodford</div><div class="ano">Car Rental Terminal · Confirmation 626182674<br>Présenter : permis FR + traduction + carte résident + passeport<br>⚠️ Dépôt R5 000 + carburant bloqués sur carte</div><div class="adur">⏱ 30-45min</div></div></div>
+<div class="ai"><div class="at">~15h</div><div class="ac"><div class="an">🏨 Check-in Ladybird</div><div class="ano">Check-in 15h-21h · Bagages stockables avant</div><div class="adur">⏱ jusqu'à 21h</div></div></div>
+<div class="ai"><div class="at">Soir</div><div class="ac"><div class="an">🍽️ Hussar Grill · Stellenbosch</div><div class="ano">Steakhouse · Viande halal · Centre ville</div><div class="adur">⏱ 1h30</div></div></div>
+</div>
+<div class="hcard"><div class="hn">🏨 Ladybird Boutique Hotel at Kanonkop</div>
+<div class="hr"><span>📍</span><span>R44 Elsenburg, Stellenbosch 7607</span></div>
+<div class="hr"><span>🕐</span><span>Check-in 15h-21h · Check-out avant 10h</span></div>
+<div class="hr"><span>🍳</span><span>Petit-déjeuner inclus · Restaurant 7h-20h</span></div>
+<div class="hr"><span>⚡</span><span>Générateur nuit uniquement 19h-07h</span></div>
+<div class="hr"><span>💶</span><span>143€ (2 nuits) · 24-26/06</span></div>
+<a class="lb" href="https://maps.app.goo.gl/MoPtY8uF8faywNaC8" target="_blank">🗺️ GPS</a>
+<a class="lb" href="tel:+27609460497">📞 Réception</a>
+<a class="lb" href="tel:+27103008751">📞 Reservations</a></div>
+<div class="info">Activités Ladybird : Picnic Basket R395/couple · Braai Pack R395/couple · Vélo R650/j — réserver au check-in selon météo.</div>
+<div class="warn">Load-shedding : générateur 19h-07h uniquement. Garder chargeur solaire accessible.</div>
+</div></div>
+
+<!-- J2 -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge">J2</div><div class="di"><div class="dn">🍷 Franschhoek · Wine Tram + Gastronomie</div><div class="dd">Mercredi 25 juin · Stellenbosch</div></div><div class="da">›</div></div>
+<div class="dcb"><div class="al">
+<div class="ai"><div class="at">Matin</div><div class="ac"><div class="an">🏛️ Dorp Street + Village Museum</div><div class="ano">Rue historique Cape Dutch · Museum 4 maisons restaurées</div><div class="adur">⏱ 1h-1h30</div></div></div>
+<div class="ai"><div class="at">Matin</div><div class="ac"><div class="an">🛒 Courses Stellenbosch (si frigo dispo)</div><div class="ano">Viande halal + provisions Cederberg · ⚠️ Reporter J3 si pas de frigo</div><div class="adur">⏱ 45min</div></div></div>
+<div class="ai"><div class="at">Matin</div><div class="ac"><div class="an">🚃 Wine Tram Franschhoek</div><div class="ano">Réserver la veille ou le matin · ~R280-350pp</div><div class="adur">⏱ 3-4h</div>
+<div style="margin-top:4px"><a class="lb r" href="https://winetram.co.za" target="_blank">📅 Réserver en ligne</a></div></div></div>
+<div class="ai"><div class="at">20h00</div><div class="ac"><div class="an">🍽️ La Petite Colombe · Dîner gastronomique</div><div class="ano">✅ Réservé · Dépôt R2010 payé · 1 guest poisson/végétarien · R1395pp</div><div class="adur">⏱ 3h</div></div></div>
+</div>
+<div class="shop">🛒 Si frigo disponible : acheter viande halal + provisions Cederberg ce matin. Sinon reporter au J3 matin avant départ.</div>
+</div></div>
+
+<!-- J3 TRANSIT -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge t">J3</div><div class="di"><div class="dn">🚘🏔️ Stellenbosch → Cederberg · Route des Vignobles</div><div class="dd">Jeudi 26 juin 2026</div></div><div class="da">›</div></div>
+<div class="dcb">
+<div class="tc"><strong>🚗 Stellenbosch → Mount Ceder</strong><div class="ts"><div><span class="tsv">201 km</span><span class="tsl">Distance</span></div><div><span class="tsv">3h00</span><span class="tsl">Durée</span></div><div><span class="tsv">~14h</span><span class="tsl">Arrivée</span></div></div><div class="tr2">R44 → N1 → R43 → R46 → R303</div><div class="chips"><span class="chip">⏰ Départ 9h-10h</span><span class="chip">🏁 Check-in 14h-17h</span></div><a class="lb" href="https://maps.app.goo.gl/de3saYEHE1BGhwvn7" target="_blank">🗺️ Maps</a></div>
+<div class="al">
+<div class="ai"><div class="at">Matin</div><div class="ac"><div class="an">🛒 Courses (si reportées J2)</div><div class="ano">Woolworths/Checkers Stellenbosch · Viande halal + provisions Cederberg · Glacière rigide</div><div class="adur">⏱ 45min</div></div></div>
+<div class="ai"><div class="at">En route</div><div class="ac"><div class="an">🏔️ Pakhuis Pass</div><div class="ano">Col scénique sur la R303</div><div class="adur">⏱ Arrêt 15-20min</div></div></div>
+<div class="ai"><div class="at">~14h</div><div class="ac"><div class="an">🏕️ Check-in Mount Ceder</div><div class="ano">⚠️ Bois interdit à apporter — acheter à la réception</div><div class="adur">⏱ Check-in 14h-17h</div></div></div>
+</div>
+<div class="shop">🛒 Si courses reportées : viande halal, fruits, fromages, pain, condiments. Glacière rigide.<br>⚠️ Bois interdit à Mount Ceder — acheter à la réception.</div>
+<div class="warn">Faire le plein avant Clanwilliam — dernier distributeur à ~60km. Pistes gravier : rouler prudemment.</div>
+<div class="warn">Vérifier statut accès Cederberg (incendies/inondations CapeNature) avant le départ.</div>
+<div class="hcard"><div class="hn">🏕️ Mount Ceder Lodge</div>
+<div class="hr"><span>📍</span><span>Groot River Farm, Cederberg 6826</span></div>
+<div class="hr"><span>🕐</span><span>Check-in 14h-17h · Check-out 8h-10h</span></div>
+<div class="hr"><span>🔥</span><span>Barbecue + ustensiles · Bois à acheter réception</span></div>
+<div class="hr"><span>🍽️</span><span>Light lunch 11h-16h sans résa · Dîner sur résa</span></div>
+<div class="hr"><span>💶</span><span>199€ (2 nuits) · 26-28/06</span></div>
+<a class="lb" href="https://maps.app.goo.gl/LcY6XjUd1itLJK7Q6" target="_blank">🗺️ GPS</a>
+<a class="lb" href="tel:+27230040848">📞 Lodge</a>
+<a class="lb" href="https://mountceder.co.za" target="_blank">🌐 Site</a></div>
+</div></div>
+
+<!-- J4 -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge">J4</div><div class="di"><div class="dn">🥾 Cederberg · Randonnées + Ciel étoilé</div><div class="dd">Vendredi 27 juin · Mount Ceder</div></div><div class="da">›</div></div>
+<div class="dcb"><div class="al">
+<div class="ai"><div class="at">Matin</div><div class="ac"><div class="an">🥾 Randonnée modérée (choix sur place)</div><div class="ano">Sevilla Rock Art Trail (5km) · Lot's Wife (4km) · Stadsaal Caves · Maalgat Rock Pool</div><div class="adur">⏱ 2h-3h</div></div></div>
+<div class="ai"><div class="at">Après-midi</div><div class="ac"><div class="an">🚗 Scenic drive · Middelberg + Nieuwoudts Pass</div><div class="ano">Routes panoramiques · Rooidam Lookout · Truitjieskraal</div><div class="adur">⏱ 2h</div></div></div>
+<div class="ai"><div class="at">Après-midi</div><div class="ac"><div class="an">🔥 Barbecue au lodge</div><div class="ano">Bois acheté à la réception Mount Ceder</div><div class="adur">⏱ 1h30</div></div></div>
+<div class="ai"><div class="at">Soir</div><div class="ac"><div class="an">🔭 Observation du ciel · Lodge Mount Ceder</div><div class="ano">Depuis le terrain du lodge · Zéro pollution lumineuse<br>⚠️ Lune à 95% (3j avant pleine lune 30/06) → Lune + planètes spectaculaires</div><div class="adur">⏱ 1h-2h</div></div></div>
+</div>
+<div class="moon">🌕 Phase lunaire 27/06 : Gibbeuse 95% · Pleine lune le 30/06 · Observer Lune + planètes · Cederberg = zéro pollution lumineuse</div>
+</div></div>
+
+<!-- J5 TRANSIT -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge t">J5</div><div class="di"><div class="dn">🚘⛰️ Cederberg → Oudtshoorn · Seweweekspoort</div><div class="dd">Samedi 28 juin 2026</div></div><div class="da">›</div></div>
+<div class="dcb">
+<div class="tc"><strong>🚗 Mount Ceder → Oudtshoorn</strong><div class="ts"><div><span class="tsv">399 km</span><span class="tsl">Distance</span></div><div><span class="tsv">5h28</span><span class="tsl">Durée</span></div><div><span class="tsv">~14h-15h</span><span class="tsl">Arrivée</span></div></div><div class="tr2">R303 → R46 → N1 → R323 → R62</div><div class="chips"><span class="chip">⏰ Départ 8h</span><span class="chip">🏁 Check-in dès 14h</span></div><a class="lb" href="https://maps.app.goo.gl/t78moYz7WTCa7xLS9" target="_blank">🗺️ Maps</a></div>
+<div class="al">
+<div class="ai"><div class="at">En route</div><div class="ac"><div class="an">⛰️ Seweweekspoort Mountain Pass</div><div class="ano">R323 · UNESCO · 18km gravel · Aller-retour dans le poort puis R62 · Formations spectaculaires</div><div class="adur">⏱ +1h arrêt</div></div></div>
+<div class="ai"><div class="at">~14h</div><div class="ac"><div class="an">🏡 Check-in De Zeekoe</div><div class="ano">Check-in 14h-18h</div><div class="adur">⏱ Check-in dès 14h</div></div></div>
+<div class="ai"><div class="at">Après-midi</div><div class="ac"><div class="an">🦜 Visite ferme d'autruches</div><div class="ano">~3km depuis De Zeekoe · Incontournable Oudtshoorn</div><div class="adur">⏱ 1h30</div></div></div>
+<div class="ai"><div class="at">19h30</div><div class="ac"><div class="an">🔭 Stargazing A2Zebra Adventures</div><div class="ano">Si beau temps · R750pp · Paiement sur place · WhatsApp : A2Zebra Adventures</div><div class="adur">⏱ 2h</div></div></div>
+</div>
+<div class="warn">⛽ Pas de station-service entre Laingsburg et Calitzdorp sur la R323 — faire le plein avant de quitter la N1.</div>
+<div class="hcard"><div class="hn">🏡 De Zeekoe Guest Farm</div>
+<div class="hr"><span>📍</span><span>Seekoegat Farm, R328, Oudtshoorn 6620</span></div>
+<div class="hr"><span>🕐</span><span>Check-in 14h-18h · Check-out 8h-10h · Dîner dès 18h</span></div>
+<div class="hr"><span>🍳</span><span>Petit-déjeuner inclus · Parking + WiFi</span></div>
+<div class="hr"><span>📩</span><span>Contact via Booking.com</span></div>
+<div class="hr"><span>💶</span><span>261€ (2 nuits) · 28-30/06</span></div>
+<a class="lb" href="https://maps.app.goo.gl/NiFiGprGQegWJ6ip6" target="_blank">🗺️ GPS</a></div>
+</div></div>
+
+<!-- J6 -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge">J6</div><div class="di"><div class="dn">🦦 Meerkat + Swartberg + Stargazing</div><div class="dd">Dimanche 29 juin · Oudtshoorn</div></div><div class="da">›</div></div>
+<div class="dcb"><div class="al">
+<div class="ai"><div class="at">Aube</div><div class="ac"><div class="an">🦦 Meerkat Safari · Buffelsdrift</div><div class="ano">✅ Réservé · R612pp (1 224 ZAR/~61€) · Cash sur place</div><div class="adur">⏱ 2h</div></div></div>
+<div class="ai"><div class="at">Matin</div><div class="ac"><div class="an">🕳️ Cango Caves</div><div class="ano">R328 nord · À l'aller vers Swartberg Pass</div><div class="adur">⏱ 1h30</div></div></div>
+<div class="ai"><div class="at">Milieu journée</div><div class="ac"><div class="an">🏔️ Swartberg Pass (boucle)</div><div class="ano">27km gravel · Déjeuner Prince Albert possible</div><div class="adur">⏱ 4-5h boucle</div></div></div>
+<div class="ai"><div class="at">Retour</div><div class="ac"><div class="an">💧 Meiringspoort Waterfall Viewpoint</div><div class="ano">Gorge spectaculaire R62 · Arrêt photo</div><div class="adur">⏱ 30min</div></div></div>
+<div class="ai"><div class="at">Retour</div><div class="ac"><div class="an">🐆 Cango Wildlife Ranch</div><div class="ano">Guépards + animaux exotiques</div><div class="adur">⏱ 1h</div></div></div>
+<div class="ai"><div class="at">19h30</div><div class="ac"><div class="an">🔭 Stargazing A2Zebra (si reporté J5)</div><div class="ano">R750pp · WhatsApp : A2Zebra Adventures</div><div class="adur">⏱ 2h</div></div></div>
+</div>
+<div class="info">Boucle : Oudtshoorn → R328 → Cango Caves → Swartberg Pass → Prince Albert → R62 → Meiringspoort → Cango Wildlife → Oudtshoorn.</div>
+<div class="shop">🛒 Retrait DAB 2 à Oudtshoorn avant de partir demain : 4 000-5 000 ZAR · Dernier grand distributeur.</div>
+</div></div>
+
+<!-- J7 TRANSIT -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge t">J7</div><div class="di"><div class="dn">🚘🐘 Oudtshoorn → Addo · Klein Karoo</div><div class="dd">Lundi 30 juin 2026</div></div><div class="da">›</div></div>
+<div class="dcb">
+<div class="tc"><strong>🚗 Oudtshoorn → AfriCamps Addo</strong><div class="ts"><div><span class="tsv">389 km</span><span class="tsl">Distance</span></div><div><span class="tsv">4h33</span><span class="tsl">Durée</span></div><div><span class="tsv">~13h-14h</span><span class="tsl">Arrivée</span></div></div><div class="tr2">R328 → R341 → N9 → R329 → R75 → R335</div><div class="chips"><span class="chip">⏰ Départ 8h-9h</span></div><a class="lb" href="https://maps.app.goo.gl/1d8yRVfDSJjfXQRn8" target="_blank">🗺️ Maps</a></div>
+<div class="al">
+<div class="ai"><div class="at">Matin</div><div class="ac"><div class="an">💵 Retrait DAB · Oudtshoorn</div><div class="ano">4 000-5 000 ZAR si pas fait hier</div><div class="adur">⏱ 15min</div></div></div>
+<div class="ai"><div class="at">Matin</div><div class="ac"><div class="an">🛒 Courses · Oudtshoorn avant départ</div><div class="ano">Halal Fisheries Bridgeton (7j/7 7h-21h) ou Checkers High St · Provisions barbecues Addo</div><div class="adur">⏱ 45min</div></div></div>
+<div class="ai"><div class="at">~13h</div><div class="ac"><div class="an">⛺ Check-in AfriCamps Addo</div><div class="ano">Commander breakfast/braai basket via app AC Addo (connexion requise)</div><div class="adur">⏱ Check-in 14h-16h30</div></div></div>
+</div>
+<div class="shop">🛒 Halal Fisheries Bridgeton (7j/7 7h-21h) ou Checkers High St.<br>⚠️ Woolworths Oudtshoorn : Visa refusé signalé — éviter.</div>
+<div class="hcard"><div class="hn">⛺ AfriCamps Addo</div>
+<div class="hr"><span>📍</span><span>R335, Swanepoelskraal 6105</span></div>
+<div class="hr"><span>🕐</span><span>Check-in 14h-16h30 · Check-out 8h-10h</span></div>
+<div class="hr"><span>🔥</span><span>Bois, eau, allume-feu dispo réception 24h/24</span></div>
+<div class="hr"><span>📱</span><span>App AC Addo : breakfast + braai basket (connexion requise)</span></div>
+<div class="hr"><span>📩</span><span>WhatsApp : AfriCamps Addo</span></div>
+<div class="hr"><span>💶</span><span>449€ (2 nuits) · 30/06-02/07</span></div>
+<a class="lb" href="https://maps.app.goo.gl/2ts62yXGkDtsTPho6" target="_blank">🗺️ GPS</a></div>
+</div></div>
+
+<!-- J8 -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge">J8</div><div class="di"><div class="dn">🐘 Safari Addo · Game Drive + Self-Drive</div><div class="dd">Mardi 1er juillet · Addo</div></div><div class="da">›</div></div>
+<div class="dcb"><div class="al">
+<div class="ai"><div class="at">7h30</div><div class="ac"><div class="an">🚙 Game Drive AfriCamps</div><div class="ano">✅ Réservé · R1 950pp (3 900 ZAR/~195€) · WhatsApp AfriCamps Addo</div><div class="adur">⏱ 3-4h</div></div></div>
+<div class="ai"><div class="at">Après-midi</div><div class="ac"><div class="an">🐘 Self-Drive · Addo Main Camp</div><div class="ano">R492pp frais conservation · Carte gratuite à l'entrée<br>Points : Hapoor Dam · Underground Hide · Zuurkop · Grahams Pan</div><div class="adur">⏱ Demi-journée</div>
+<div style="margin-top:4px"><a class="lb" href="https://www.sanparks.org/parks/addo-elephant/rates-entry-fees" target="_blank">💶 Tarifs</a><a class="lb" href="https://www.sanparks.org/parks/addo-elephant/travel/entrance-gates" target="_blank">🕐 Horaires</a></div></div></div>
+</div>
+<div class="warn">⛽ Une seule station-service dans le parc (Main Camp) — faire le plein avant d'entrer.<br>🚫 Ne pas rouler sur les excréments d'éléphants (scarabée bousier protégé).</div>
+<div class="info">🗺️ Carte gratuite remise à l'entrée — indispensable pour les boucles internes.</div>
+</div></div>
+
+<!-- J9 TRANSIT -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge t">J9</div><div class="di"><div class="dn">🚘🌊 Addo → Knysna · Garden Route</div><div class="dd">Mercredi 2 juillet 2026</div></div><div class="da">›</div></div>
+<div class="dcb">
+<div class="tc"><strong>🚗 Addo → Tsitsikamma (Big Tree)</strong><div class="ts"><div><span class="tsv">271 km</span><span class="tsl">Distance</span></div><div><span class="tsv">3h11</span><span class="tsl">Durée</span></div></div><div class="tr2">R342 → N10 → N2</div><a class="lb" href="https://maps.app.goo.gl/bQhgnQBPHTaLqSfk9" target="_blank">🗺️ Big Tree</a><a class="lb" href="https://maps.app.goo.gl/gMPjHbW7KKL22QzU9" target="_blank">🗺️ Main Camp</a></div>
+<div class="tc"><strong>🚗 Tsitsikamma → Knysna</strong><div class="ts"><div><span class="tsv">149 km</span><span class="tsl">Distance</span></div><div><span class="tsv">2h28</span><span class="tsl">+ détours</span></div></div><div class="tr2">N2 → R102 → Nature's Valley → Robberg → Rheenendal Rd</div><a class="lb" href="https://maps.app.goo.gl/yfjsSxNfbWbG3Vi9A" target="_blank">🗺️ Maps</a></div>
+<div class="al">
+<div class="ai"><div class="at">Départ tôt</div><div class="ac"><div class="an">🌳 The Big Tree Tsitsikamma</div><div class="ano">Grand Yellowwood · Circuits rouge 4.2km, jaune 2.6km, vert 1km</div><div class="adur">⏱ 1h-2h</div></div></div>
+<div class="ai"><div class="at">Matin</div><div class="ac"><div class="an">🌉 Pont suspendu Storms River</div><div class="ano">~R326pp · Grottes Khoisan · Boardwalk forêt<br>⚠️ Vérifier réouverture travaux (~23/06)</div><div class="adur">⏱ 1h30-2h</div>
+<div style="margin-top:4px"><a class="lb" href="https://www.sanparks.org/parks/garden-route" target="_blank">🌐 SANParks</a></div></div></div>
+<div class="ai"><div class="at">En route</div><div class="ac"><div class="an">🌁 Bloukrans Bridge</div><div class="ano">Plus haut pont bungee d'Afrique (216m) · Arrêt rapide</div><div class="adur">⏱ 30min</div></div></div>
+<div class="ai"><div class="at">En route</div><div class="ac"><div class="an">🏖️ Nature's Valley · Village caché</div><div class="ano">Village caché · Plage sauvage magnifique · Lagune · Sur R102</div><div class="adur">⏱ 30min</div></div></div>
+<div class="ai"><div class="at">Après-midi</div><div class="ac"><div class="an">🦭 The Gap · Robberg Nature Reserve</div><div class="ano">Péninsule sauvage Plettenberg Bay · Lions de mer · Baleines juillet</div><div class="adur">⏱ 1h30-2h</div></div></div>
+<div class="ai"><div class="at">Soir</div><div class="ac"><div class="an">🌿 Late check-in Forest Valley Cottages</div><div class="ano">Check-in jusqu'à 18h · Rheenendal, ~25min du centre Knysna</div><div class="adur">⏱ avant 18h</div></div></div>
+</div>
+<div class="warn">⚠️ Vérifier réouverture pont suspendu Tsitsikamma (travaux jusqu'au ~23/06) avant le 02/07.</div>
+<div class="hcard"><div class="hn">🌿 Forest Valley Cottages</div>
+<div class="hr"><span>📍</span><span>Rheenendal Ramble, Knysna 6570 (~25min du centre)</span></div>
+<div class="hr"><span>🕐</span><span>Check-in 14h-18h · Check-out avant 10h30</span></div>
+<div class="hr"><span>📩</span><span>Contact via Booking.com</span></div>
+<div class="hr"><span>💶</span><span>517€ (3 nuits) · 02-05/07</span></div>
+<a class="lb" href="https://maps.app.goo.gl/yBRa9meJvZ5QSpyq5" target="_blank">🗺️ GPS</a></div>
+</div></div>
+
+<!-- J10-J11 -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge">J10-J11</div><div class="di"><div class="dn">🦪 Knysna · Lagon + Forêt + Nature</div><div class="dd">Jeu 3 - Ven 4 juillet · Knysna</div></div><div class="da">›</div></div>
+<div class="dcb"><div class="al">
+<div class="ai"><div class="at">J10 matin</div><div class="ac"><div class="an">🚣 Kayak sur le lagon (si beau temps)</div><div class="ano">🌧️ Si mauvais temps : Huîtres Waterfront + Eastern Head Viewpoint</div><div class="adur">⏱ 2h-3h</div></div></div>
+<div class="ai"><div class="at">J10 matin</div><div class="ac"><div class="an">🦭 Featherbed Nature Reserve (option)</div><div class="ano">Vérifier dispo au Waterfront · Ferry + 4x4 + marche · ~R450pp<br>⚠️ Buffet non halal — choisir poisson/végé</div><div class="adur">⏱ 3-4h</div>
+<div style="margin-top:4px"><a class="lb r" href="https://www.knysnafeatherbed.com" target="_blank">📅 Vérifier/Réserver</a></div></div></div>
+<div class="ai"><div class="at">J10-J11</div><div class="ac"><div class="an">👁️ Eastern Head Viewpoint</div><div class="ano">Vue panoramique lagon · Baleines juillet · Gratuit</div><div class="adur">⏱ 1h</div></div></div>
+<div class="ai"><div class="at">J10-J11</div><div class="ac"><div class="an">🦪 Huîtres · Knysna Waterfront</div><div class="ano">Pleine saison juillet · Réputées mondialement</div><div class="adur">⏱ 1h</div></div></div>
+<div class="ai"><div class="at">J11</div><div class="ac"><div class="an">🌳 Garden of Eden</div><div class="ano">Boardwalk forêt facile · ~5km · Sur la N2</div><div class="adur">⏱ 1h30</div></div></div>
+<div class="ai"><div class="at">J11</div><div class="ac"><div class="an">🏝️ Thesen Islands + Bollards Bay</div><div class="ano">Architecture maritime · Plage calme</div><div class="adur">⏱ 1h30</div></div></div>
+<div class="ai"><div class="at">J11</div><div class="ac"><div class="an">🏖️ Brenton-on-Sea</div><div class="ano">Plage sauvage + marche côtière · ~15min</div><div class="adur">⏱ 1h-2h</div></div></div>
+</div>
+<div class="stitle" style="margin-top:14px">Restaurants Knysna</div>
+<div class="ri"><div class="rn">The Drydock Food Co</div><div class="rd">Bord de lagon · Fruits de mer · Halal confirmé</div><div class="rt"><span class="tag tg">✅ Halal</span></div></div>
+<div class="ri"><div class="rn">Freshline Fisheries</div><div class="rd">Poissonnerie-resto · Ultra-frais · BYOB</div><div class="rt"><span class="tag ti">🐟 Poisson</span></div></div>
+<div class="ri"><div class="rn">34 Degrees South · Knysna Quays</div><div class="rd">Deli + vue lagon · Fruits de mer</div></div>
+<div class="ri"><div class="rn">Amazen Foods</div><div class="rd">Épicerie halal · <a href="tel:0837821000" style="color:var(--gold2)">083 782 1000</a></div><div class="rt"><span class="tag tg">✅ Halal certifié</span></div></div>
+</div></div>
+
+<!-- J12 TRANSIT -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge t">J12</div><div class="di"><div class="dn">🚘🌿 Knysna → Wilderness · Lagon &amp; Forêts</div><div class="dd">Samedi 5 juillet 2026</div></div><div class="da">›</div></div>
+<div class="dcb">
+<div class="tc"><strong>🚗 Knysna → Wilderness</strong><div class="ts"><div><span class="tsv">42.3 km</span><span class="tsl">Distance</span></div><div><span class="tsv">36 min</span><span class="tsl">Durée</span></div></div><div class="tr2">Rheenendal Rd → N2</div><a class="lb" href="https://maps.app.goo.gl/8FLNCUUbUwdPjoM68" target="_blank">🗺️ Maps</a></div>
+<div class="al">
+<div class="ai"><div class="at">En route</div><div class="ac"><div class="an">🗺️ Map of Africa Viewpoint</div><div class="ano">Embouchure Kaaimans + Touws formant silhouette de l'Afrique</div><div class="adur">⏱ 30min</div></div></div>
+<div class="ai"><div class="at">Après-midi</div><div class="ac"><div class="an">🐬 Dolphin Point + Gwarrie Pan</div><div class="ano">Vue panoramique · Baleines + dauphins en juillet</div><div class="adur">⏱ 45min</div></div></div>
+<div class="ai"><div class="at">Après-midi</div><div class="ac"><div class="an">🏖️ Wilderness Beach + Victoria Bay</div><div class="ano">Plage principale · Victoria Bay 15min : baie en fer à cheval</div><div class="adur">⏱ 1h30</div></div></div>
+</div>
+<div class="hcard"><div class="hn">🏠 Dolphin Dunes Guesthouse</div>
+<div class="hr"><span>📍</span><span>1971 Buxton Close, Wilderness 6560</span></div>
+<div class="hr"><span>🕐</span><span>Check-in 14h-17h · Check-out 8h-10h</span></div>
+<div class="hr"><span>🍳</span><span>Petit-déjeuner inclus · Parking + WiFi</span></div>
+<div class="hr"><span>📩</span><span>Contact via Booking.com</span></div>
+<div class="hr"><span>💶</span><span>60€ · 05-06/07</span></div>
+<a class="lb" href="https://maps.app.goo.gl/dzrRnnusKQcniijS9" target="_blank">🗺️ GPS</a></div>
+</div></div>
+
+<!-- J13 TRANSIT -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge t">J13</div><div class="di"><div class="dn">🚘🐋 Wilderness → De Hoop → Swellendam</div><div class="dd">Dimanche 6 juillet 2026</div></div><div class="da">›</div></div>
+<div class="dcb">
+<div class="tc"><strong>🚗 Wilderness → De Hoop (Koppie Alleen)</strong><div class="ts"><div><span class="tsv">304 km</span><span class="tsl">Distance</span></div><div><span class="tsv">4h09</span><span class="tsl">Durée</span></div><div><span class="tsv">~10h30</span><span class="tsl">Arrivée De Hoop</span></div></div><div class="tr2">N2 → Mossel Bay → N2 → De Hoop entrance</div><div class="chips"><span class="chip">⏰ Départ 6h30-7h</span></div><a class="lb" href="https://maps.app.goo.gl/XvXGpvtika7irMkZ8" target="_blank">🗺️ Maps</a></div>
+<div class="tc"><strong>🚗 De Hoop → Swellendam</strong><div class="ts"><div><span class="tsv">68.2 km</span><span class="tsl">Distance</span></div><div><span class="tsv">1h14</span><span class="tsl">Durée</span></div></div><div class="tr2">N2 → R60 → Bethel St</div><a class="lb" href="https://maps.app.goo.gl/sF9jGq4u2awrULDN8" target="_blank">🗺️ Maps</a></div>
+<div class="al">
+<div class="ai"><div class="at">~10h30</div><div class="ac"><div class="an">🐋 Koppie Alleen · Observation baleines</div><div class="ano">Hautes dunes + boardwalk · Juillet = début saison · ⚠️ Vérifier marée basse 06/07</div><div class="adur">⏱ 2h</div></div></div>
+<div class="ai"><div class="at">~13h</div><div class="ac"><div class="an">🚗 Départ vers Swellendam</div><div class="ano">68km · 1h14</div><div class="adur">⏱ 1h14</div></div></div>
+<div class="ai"><div class="at">~14h30</div><div class="ac"><div class="an">Check-in Arumvale · Déjeuner Swellendam</div><div class="ano">Voortrek Street · Drostdy Museum</div><div class="adur">⏱ Après-midi</div></div></div>
+<div class="ai"><div class="at">Après-midi</div><div class="ac"><div class="an">🏛️ Drostdy Museum + centre Swellendam</div><div class="ano">Architecture coloniale · Voortrek Street</div><div class="adur">⏱ 1h30</div></div></div>
+<div class="ai"><div class="at">Après-midi</div><div class="ac"><div class="an">🌿 Réserve naturelle Marloth (option)</div><div class="ano">Randonnées courtes · Faune locale</div><div class="adur">⏱ 1h-2h</div></div></div>
+</div>
+<div class="warn">De Hoop ouvre à 7h. Routes gravier à l'approche + 25min internes jusqu'à Koppie Alleen. Vérifier marée basse du 06/07.</div>
+<div class="hcard"><div class="hn">🌺 Arumvale Country Retreat</div>
+<div class="hr"><span>📍</span><span>7 Bethel Rd, Hermitage Valley, Swellendam 6740</span></div>
+<div class="hr"><span>🕐</span><span>Check-in 14h-20h · Check-out avant 11h</span></div>
+<div class="hr"><span>🚗</span><span>Parking + WiFi inclus</span></div>
+<div class="hr"><span>📩</span><span>Contact via Booking.com</span></div>
+<div class="hr"><span>💶</span><span>70€ · 06-07/07</span></div>
+<a class="lb" href="https://maps.app.goo.gl/9uPSRp3iSrCTbe3n9" target="_blank">🗺️ GPS</a></div>
+</div></div>
+
+<!-- J14 TRANSIT -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge t">J14</div><div class="di"><div class="dn">🚘🌍 Swellendam → Le Cap · Route Côtière</div><div class="dd">Lundi 7 juillet 2026</div></div><div class="da">›</div></div>
+<div class="dcb">
+<div class="al">
+<div class="ai"><div class="at">7h-9h (option)</div><div class="ac"><div class="an">🦌 Parc Bontebok · Self-Drive</div><div class="ano">6km de Swellendam · Ouverture 7h · Tarif sur place · Bontebok, zèbres, 200+ oiseaux</div><div class="adur">⏱ 2h</div></div></div>
+</div>
+<div class="tc"><strong>🚗 Swellendam → Le Cap · Route côtière</strong><div class="ts"><div><span class="tsv">438 km</span><span class="tsl">Distance</span></div><div><span class="tsv">6h33</span><span class="tsl">+ détours</span></div><div><span class="tsv">~17h-18h</span><span class="tsl">Arrivée</span></div></div><div class="tr2">R60 → R319 → R316 (Arniston) → R319 → Cap Agulhas → R317 → R43 (Hermanus) → R44 → Betty's Bay → Gordon's Bay → N2</div><div class="chips"><span class="chip">⏰ Départ 9h-9h30</span></div><a class="lb" href="https://maps.app.goo.gl/B18v5oWzvr1L457C9" target="_blank">🗺️ Maps</a></div>
+<div class="al">
+<div class="ai"><div class="at">En route</div><div class="ac"><div class="an">🏘️ Arniston · Village de pêcheurs</div><div class="ano">Village blanc à la chaux · Maisons traditionnelles uniques · Absolument à voir</div><div class="adur">⏱ 30min · Détour +30min</div></div></div>
+<div class="ai"><div class="at">En route</div><div class="ac"><div class="an">🌍 Cap Agulhas · Pointe méridionale</div><div class="ano">Pointe la plus méridionale d'Afrique · Frontière officielle Atlantique/Indien</div><div class="adur">⏱ 30min · Détour +20min</div></div></div>
+<div class="ai"><div class="at">En route</div><div class="ac"><div class="an">🐋 Hermanus · Baleines côtières</div><div class="ano">Cliff Walk gratuit Walker Bay · Juillet = bonne saison</div><div class="adur">⏱ 30-45min</div></div></div>
+<div class="ai"><div class="at">En route</div><div class="ac"><div class="an">🐧 Betty's Bay · Stony Point</div><div class="ano">Manchots moins touristiques que Boulders · Sur R44</div><div class="adur">⏱ 20min</div></div></div>
+<div class="ai"><div class="at">En route</div><div class="ac"><div class="an">🌊 Gordon's Bay → Route 44 côtière</div><div class="ano">Une des plus belles routes côtières d'Afrique du Sud · False Bay + montagnes</div><div class="adur">⏱ Scenic drive</div></div></div>
+</div>
+<div class="hcard"><div class="hn">🏙️ The Trade Boutique Hotel</div>
+<div class="hr"><span>📍</span><span>55 Shortmarket Street, Cape Town CBD 8000</span></div>
+<div class="hr"><span>🕐</span><span>Check-in 14h-23h30 · Check-out 5h-10h</span></div>
+<div class="hr"><span>🍳</span><span>Petit-déjeuner inclus</span></div>
+<div class="hr"><span>🚗</span><span>Parking R250/nuit · Booking.com · Paiement sur place</span></div>
+<div class="hr"><span>📩</span><span>Contact via Booking.com</span></div>
+<div class="hr"><span>💶</span><span>223€ (2 nuits) · 07-09/07</span></div>
+<a class="lb" href="https://maps.app.goo.gl/XCiaWBkfkQmELzHq7" target="_blank">🗺️ GPS</a></div>
+</div></div>
+
+<!-- J15 -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge">J15</div><div class="di"><div class="dn">🐧 Cape Point + Bo-Kaap + Signal Hill</div><div class="dd">Mardi 8 juillet · Le Cap</div></div><div class="da">›</div></div>
+<div class="dcb"><div class="al">
+<div class="ai"><div class="at">8h00</div><div class="ac"><div class="an">🐧 Boulders Beach · Manchots</div><div class="ano">Arriver tôt · Simon's Town</div><div class="adur">⏱ 1h30</div></div></div>
+<div class="ai"><div class="at">Matin</div><div class="ac"><div class="an">🏔️ Cape Point + Cape of Good Hope</div><div class="ano">Funiculaire Flying Dutchman · ⚠️ Babouins — ne pas nourrir</div><div class="adur">⏱ 2h</div></div></div>
+<div class="ai"><div class="at">Midi</div><div class="ac"><div class="an">🌊 Chapman's Peak Drive</div><div class="ano">Route falaise · Points de vue · Péage ~R60</div><div class="adur">⏱ 45min scenic drive</div></div></div>
+<div class="ai"><div class="at">Après-midi</div><div class="ac"><div class="an">🕌 Bo-Kaap + Kramat Sheikh Ghaibie Shah</div><div class="ano">Maisons colorées · Mausolée islamique historique · Restaurants halal</div><div class="adur">⏱ 1h30</div></div></div>
+<div class="ai"><div class="at">~17h30</div><div class="ac"><div class="an">🌅 Signal Hill · Coucher de soleil</div><div class="ano">Arriver 1h avant · Rester pour observation du ciel</div><div class="adur">⏱ 2h-3h</div></div></div>
+<div class="ai"><div class="at">Soir</div><div class="ac"><div class="an">🔭 Observation du ciel · Signal Hill</div><div class="ano">🌗 Lune 46% · Meilleure nuit du voyage · Rester jusqu'à 22h-23h</div><div class="adur">⏱ 1h-2h</div></div></div>
+<div class="ai"><div class="at">Nuit</div><div class="ac"><div class="an">🎶 Nightlife Le Cap (option)</div><div class="ano">Shimmy Beach Club · Cause &amp; Effect · De Waterkant crawl</div><div class="adur">⏱ Selon envie</div></div></div>
+</div>
+<div class="moon">🌗 Phase lunaire 08/07 : 46% décroissante · Meilleure nuit du voyage · Lune se lève vers 23h → observer avant</div>
+<div class="stitle" style="margin-top:14px">Restaurants Le Cap (halal)</div>
+<div class="ri"><div class="rn">Biesmiellah · Bo-Kaap</div><div class="rd">2 Wale St · Cape Malay depuis 1982 · Bobotie, curry · Fermé dimanche</div><div class="rt"><span class="tag tg">✅ Halal certifié</span></div></div>
+<div class="ri"><div class="rn">Bo-Kaap Kombuis</div><div class="rd">7 August St · Cape Malay · Vue Table Mountain</div><div class="rt"><span class="tag tg">✅ Halal</span></div></div>
+<div class="ri"><div class="rn">Eastern Food Bazaar</div><div class="rd">96 Longmarket St · 10 cuisines · Tout halal · Style canteen</div><div class="rt"><span class="tag tg">✅ Halal</span></div></div>
+<div class="ri"><div class="rn">Conscious Carnivores · V&amp;A</div><div class="rd">Wagyu + Angus halal premium · V&amp;A Waterfront</div><div class="rt"><span class="tag tg">✅ Halal</span></div></div>
+</div></div>
+
+<!-- J16 -->
+<div class="day-card"><div class="dch" onclick="toggleDay(this.parentElement)"><div class="day-badge">J16</div><div class="di"><div class="dn">✈️ Dernier jour · V&amp;A + Départ CPT</div><div class="dd">Mercredi 9 juillet · Le Cap → Tunis</div></div><div class="da">›</div></div>
+<div class="dcb"><div class="al">
+<div class="ai"><div class="at">Matin</div><div class="ac"><div class="an">🛍️ V&amp;A Waterfront + Greenmarket Square</div><div class="ano">Derniers achats · Biltong Baron · Vins · Négocier -30-50% à Greenmarket</div><div class="adur">⏱ 2h</div></div></div>
+<div class="ai"><div class="at">Option</div><div class="ac"><div class="an">🏔️ Table Mountain · Câble car</div><div class="ano">Vérifier météo la veille · Descente avant 12h30</div><div class="adur">⏱ 2h-3h si météo OK</div>
+<div style="margin-top:4px"><a class="lb" href="https://www.tablemountain.net" target="_blank">🌐 Réserver/Vérifier</a></div></div></div>
+<div class="ai"><div class="at">⚠️ Avant 12h30</div><div class="ac"><div class="an">⛽ Faire le plein avant l'aéroport</div><div class="ano">Impératif avant restitution</div><div class="adur">⏱ 15min</div></div></div>
+<div class="ai"><div class="at">13h30</div><div class="ac"><div class="an">🚗 Restitution voiture · Woodford CPT Airport</div><div class="ano">⚠️ Retourner au comptoir Woodford pour récupérer le dépôt R5 000 · Confirmation 626182674</div><div class="adur">⏱ 30min</div></div></div>
+<div class="ai"><div class="at">16h35</div><div class="ac"><div class="an">✈️ TK045 · Cape Town → Istanbul → Tunis</div><div class="ano">A350 XWB · Economy · Escale IST 3h30 · Arrivée TUN 09h00 (J+1)</div><div class="adur">⏱ Vol 10h</div></div></div>
+</div>
+<div class="tc"><strong>🚗 Le Cap → CPT Airport</strong><div class="ts"><div><span class="tsv">18.4 km</span><span class="tsl">Distance</span></div><div><span class="tsv">37 min</span><span class="tsl">Durée</span></div></div><div class="tr2">N2 → sortie 16</div><a class="lb" href="https://maps.app.goo.gl/2jRaZNEt4Sw7dUuM6" target="_blank">🗺️ Maps</a></div>
+</div></div>
+
+</div>
+
+<div id="screen-must" class="screen">
+  <div class="stitle">Incontournables · Ordre chronologique</div>
+  <div id="must-list"></div>
+</div>
+
+<div id="screen-lieux" class="screen">
+  <input type="text" class="sb" placeholder="🔍 Rechercher un lieu..." id="lieu-search" oninput="filterLieux()">
+  <div class="fr" id="filter-row"></div>
+  <div id="lieux-list"></div>
+</div>
+
+<div id="screen-budget" class="screen">
+<div class="bt"><div class="btl">Budget total estimé (pessimiste)</div><div class="btv">~5 600 €</div><div class="bts">Vols + hébergements + activités + cash + carte</div></div>
+<div class="stitle">Dépenses fixes</div>
+<div class="card"><table class="bt2">
+<tr><td>✈️ Vols (2 pers)<span class="sub">Turkish Airlines · PNR VAYSDU</span></td><td>1 610 €</td></tr>
+<tr><td>🏨 Hébergements (16 nuits)<span class="sub">8 étapes confirmées</span></td><td>1 922 €</td></tr>
+<tr><td>🍽️ Dépôt La Petite Colombe<span class="sub">Déduit de l'addition sur place</span></td><td>~100 €</td></tr>
+</table></div>
+<div class="stitle">Activités réservées · Paiement sur place</div>
+<div class="card"><table class="bt2">
+<tr><td>🦦 Meerkat Safari × 2<span class="sub">R612pp · Cash · Buffelsdrift</span></td><td>R1 224 <span class="sub">~61 €</span></td></tr>
+<tr><td>🔭 Stargazing A2Zebra × 2<span class="sub">R750pp · WhatsApp A2Zebra Adventures</span></td><td>R1 500 <span class="sub">~75 €</span></td></tr>
+<tr><td>🚙 Game Drive AfriCamps × 2<span class="sub">R1 950pp · WhatsApp AfriCamps Addo</span></td><td>R3 900 <span class="sub">~195 €</span></td></tr>
+</table></div>
+<div class="stitle">Activités à payer sur place</div>
+<div class="card"><table class="bt2">
+<tr><td>🐘 Addo conservation × 2 pers × 2j<span class="sub">R492pp/jour · Tarifs 2025-2026</span></td><td>R1 968 <span class="sub">~98 €</span></td></tr>
+<tr><td>🌉 Tsitsikamma entrée × 2<span class="sub">~R326pp</span></td><td>~R650 <span class="sub">~33 €</span></td></tr>
+<tr><td>🐋 De Hoop entrée × 2<span class="sub">Tarif sur place</span></td><td>~R200 <span class="sub">~10 €</span></td></tr>
+<tr><td>🦭 Robberg Nature Reserve × 2<span class="sub">Tarif sur place</span></td><td>~R200 <span class="sub">~10 €</span></td></tr>
+<tr><td>🍽️ La Petite Colombe × 2<span class="sub">R1 395pp · Menu 6 plats</span></td><td>R2 790 <span class="sub">~140 €</span></td></tr>
+<tr><td>🚃 Wine Tram Franschhoek × 2<span class="sub">~R280-350pp</span></td><td>~R700 <span class="sub">~35 €</span></td></tr>
+<tr><td>🏔️ Table Mountain câble car × 2<span class="sub">Option météo · Tarif sur site</span></td><td>~R900 <span class="sub">~45 €</span></td></tr>
+<tr><td>🦭 Featherbed Knysna × 2 (option)<span class="sub">~R450pp</span></td><td>~R900 <span class="sub">~45 €</span></td></tr>
+<tr><td>🚗 Parking The Trade × 2 nuits<span class="sub">R250/nuit</span></td><td>R500 <span class="sub">~25 €</span></td></tr>
+</table></div>
+<div class="stitle">Budget cash estimé</div>
+<div class="card"><table class="bt2">
+<tr><td>🎯 Activités cash confirmées<span class="sub">Meerkat + Stargazing + Game Drive</span></td><td>R6 624 <span class="sub">~331 €</span></td></tr>
+<tr><td>🙏 Pourboires<span class="sub">100-150 ZAR/guide · 10-15% resto · R20-30 pompiste</span></td><td>R1 900 <span class="sub">~95 €</span></td></tr>
+<tr><td>🛒 Courses alimentaires<span class="sub">Viande halal + provisions barbecues</span></td><td>R2 000 <span class="sub">~100 €</span></td></tr>
+<tr><td>❄️ Glacière + petits achats</td><td>R500 <span class="sub">~25 €</span></td></tr>
+<tr><td>🛍️ Marchés + imprévus</td><td>R2 000 <span class="sub">~100 €</span></td></tr>
+<tr style="background:rgba(201,168,76,.1)"><td><strong>Total cash</strong><span class="sub">Retrait 1 CPT : R6 500 · Retrait 2 Oudtshoorn : R5 000</span></td><td><strong>~R13 000<br>~650 €</strong></td></tr>
+</table></div>
+<div class="stitle">Budget carte estimé</div>
+<div class="card"><table class="bt2">
+<tr><td>⛽ Carburant<span class="sub">~2 500km · 7L/100 · R22/L</span></td><td>~195 €</td></tr>
+<tr><td>🍽️ Restaurants (5-6 sorties)</td><td>~200 €</td></tr>
+<tr><td>🦁 Activités carte<span class="sub">Addo, Tsitsikamma, Table Mountain, Wine Tram, De Hoop, Robberg</span></td><td>~280 €</td></tr>
+<tr><td>🛒 Courses supermarché</td><td>~100 €</td></tr>
+<tr><td>🛍️ Souvenirs<span class="sub">Biltong, Rooibos, cuir autruche, vins</span></td><td>~150 €</td></tr>
+<tr><td>🅿️ Divers<span class="sub">Parking Trade + péages + imprévus</span></td><td>~110 €</td></tr>
+<tr style="background:rgba(201,168,76,.1)"><td><strong>Total carte</strong><span class="sub">Boursorama Visa uniquement</span></td><td><strong>~1 035 €</strong></td></tr>
+</table></div>
+<div class="stitle">Convertisseur ZAR ↔ EUR</div>
+<div class="cv">
+<div style="font-size:12px;color:var(--text3)">Taux de référence : 1 € = 20 ZAR (offline)</div>
+<div class="cvr"><input type="number" class="cvi" id="zar-input" placeholder="ZAR" oninput="convertZAR()"><span class="cvl">ZAR</span><span class="cvres" id="eur-result">= 0 €</span></div>
+<div class="cvr"><input type="number" class="cvi" id="eur-input" placeholder="EUR" oninput="convertEUR()"><span class="cvl">EUR</span><span class="cvres" id="zar-result">= 0 ZAR</span></div>
+</div>
+</div>
+
+<div id="screen-pratique" class="screen">
+<a class="urg" href="tel:0730000911">🚨 Urgence médicale · 0730000911</a>
+
+<div class="ps" onclick="togglePratique(this)"><div class="ph"><span class="phi">🚗</span><span class="pht">Location voiture · Woodford</span><span class="pha">›</span></div>
+<div class="pb">
+<div class="ir"><div class="il">Confirmation</div><div class="iv"><strong>626182674</strong></div></div>
+<div class="ir"><div class="il">Véhicule</div><div class="iv">Toyota Urban Cruiser · Auto · 5 places · Kilom. illimité</div></div>
+<div class="ir"><div class="il">Prise en charge</div><div class="iv">24/06 · 13h30 · CPT Airport · Car Rental Terminal</div></div>
+<div class="ir"><div class="il">Restitution</div><div class="iv">09/07 · 13h30 · CPT Airport · ⚠️ Récupérer dépôt R5 000 au comptoir après restitution</div></div>
+<div class="ir"><div class="il">Assurance</div><div class="iv">Full Protection incluse ✅ · Franchise R30 000 couverte · Ne pas souscrire double assurance</div></div>
+<div class="ir"><div class="il">Dépôt</div><div class="iv">R5 000 bloqué sur carte à la prise en charge + dépôt carburant</div></div>
+<div class="ir"><div class="il">Carburant</div><div class="iv">Like for like · Rendre avec niveau identique · Service charge R50 si manque · Faire le plein avant retour</div></div>
+<div class="ir"><div class="il">Documents</div><div class="iv">Permis français + traduction assermentée + apostille La Haye + carte résident + passeport tunisien</div></div>
+<div class="warn">Conduire à GAUCHE. Ronds-points sens horaire. Éviter conduite de nuit hors zones urbaines (animaux sur route).</div>
+<div class="warn">En cas d'accident/panne : appeler Woodford immédiatement. Garder toute documentation. Rapport de police requis.</div>
+<a class="lb" href="tel:+27219347165">📞 Woodford +27 21 934 7165</a>
+<a class="lb" href="https://maps.app.goo.gl/oNzpJQ8D79MjDgHG9" target="_blank">🗺️ Pick-up Terminal</a>
+</div></div>
+
+<div class="ps" onclick="togglePratique(this)"><div class="ph"><span class="phi">✈️</span><span class="pht">Vols · Turkish Airlines</span><span class="pha">›</span></div>
+<div class="pb">
+<div class="ir"><div class="il">PNR</div><div class="iv"><strong>VAYSDU</strong></div></div>
+<div class="ir"><div class="il">Tickets</div><div class="iv">235-7473961411 / 235-7473961410</div></div>
+<div class="ir"><div class="il">Aller</div><div class="iv">23/06 17h15 TUN → 22h05 IST (TK664 A321neo) · 01h45 IST → 11h50 CPT (TK044 A350)</div></div>
+<div class="ir"><div class="il">Retour</div><div class="iv">09/07 16h35 CPT → 04h35 IST (TK045 A350) · 08h05 IST → 09h00 TUN (TK661 A321neo)</div></div>
+<div class="ir"><div class="il">Escales</div><div class="iv">Istanbul 3h40 (aller) · Istanbul 3h30 (retour) · Pas de récupération bagages</div></div>
+</div></div>
+
+<div class="ps" onclick="togglePratique(this)"><div class="ph"><span class="phi">📞</span><span class="pht">Contacts importants</span><span class="pha">›</span></div>
+<div class="pb">
+<div class="ci"><div class="cinfo"><div class="cn">🚨 Urgence médicale Afrique du Sud</div><div class="cnum">0730000911</div></div><a class="cbtn" href="tel:0730000911">📞</a></div>
+<div class="ci"><div class="cinfo"><div class="cn">Woodford Car Rental</div><div class="cnum">+27 21 934 7165</div></div><a class="cbtn" href="tel:+27219347165">📞</a></div>
+<div class="ci"><div class="cinfo"><div class="cn">Ladybird · Réception</div><div class="cnum">+27 60 946 0497 / +27 69 477 2122</div></div><a class="cbtn" href="tel:+27609460497">📞</a></div>
+<div class="ci"><div class="cinfo"><div class="cn">Ladybird · Reservations</div><div class="cnum">+27 10 300 8751</div></div><a class="cbtn" href="tel:+27103008751">📞</a></div>
+<div class="ci"><div class="cinfo"><div class="cn">Mount Ceder · Lodge</div><div class="cnum">+27 23 004 0848</div></div><a class="cbtn" href="tel:+27230040848">📞</a></div>
+<div class="ci"><div class="cinfo"><div class="cn">Mount Ceder · WhatsApp</div><div class="cnum">+27 67 434 4359</div></div><a class="cbtn" href="tel:+27674344359">📞</a></div>
+<div class="ci"><div class="cinfo"><div class="cn">A2Zebra Adventures · Stargazing</div><div class="cnum">WhatsApp : A2Zebra Adventures</div></div></div>
+<div class="ci"><div class="cinfo"><div class="cn">AfriCamps Addo · Game Drive</div><div class="cnum">WhatsApp : AfriCamps Addo</div></div></div>
+<div class="ci"><div class="cinfo"><div class="cn">La Petite Colombe</div><div class="cnum">+27 21 202 3395</div></div><a class="cbtn" href="tel:+27212023395">📞</a></div>
+<div class="ci"><div class="cinfo"><div class="cn">Amazen Foods Knysna · Halal</div><div class="cnum">083 782 1000</div></div><a class="cbtn" href="tel:0837821000">📞</a></div>
+<div class="ci"><div class="cinfo"><div class="cn">De Zeekoe / Forest Valley / Dolphin Dunes / Arumvale</div><div class="cnum">Via Booking.com messages</div></div></div>
+</div></div>
+
+<div class="ps" onclick="togglePratique(this)"><div class="ph"><span class="phi">💳</span><span class="pht">Argent &amp; Paiements</span><span class="pha">›</span></div>
+<div class="pb">
+<div class="ir"><div class="il">Carte</div><div class="iv">Boursorama Visa uniquement</div></div>
+<div class="ir"><div class="il">Retrait 1</div><div class="iv">Aéroport CPT · 6 000-7 000 ZAR (~325-350€) · Dès l'arrivée</div></div>
+<div class="ir"><div class="il">Retrait 2</div><div class="iv">Oudtshoorn avant départ Addo · 4 000-5 000 ZAR (~200-250€)</div></div>
+<div class="ir"><div class="il">Taux réf.</div><div class="iv">1 € = 20 ZAR</div></div>
+<div class="warn">Woolworths Oudtshoorn : Visa refusé signalé → utiliser Halal Fisheries ou Checkers.</div>
+<div class="info">Pourboires : 100-150 ZAR/guide · 10-15% resto · R20-30 pompiste · Cash préféré.</div>
+</div></div>
+
+<div class="ps" onclick="togglePratique(this)"><div class="ph"><span class="phi">🛒</span><span class="pht">Achats &amp; Souvenirs par étape</span><span class="pha">›</span></div>
+<div class="pb">
+<div class="stitle" style="margin-top:10px">Courses alimentaires</div>
+<div class="ar"><div class="ae">Stellenbosch J2-J3</div><div class="av">Viande halal + provisions Cederberg (Woolworths/Checkers/Pick n Pay) · Glacière rigide · Si frigo J2, sinon J3 matin avant départ</div></div>
+<div class="ar"><div class="ae">Oudtshoorn J7</div><div class="av">Halal Fisheries Bridgeton (7j/7 7h-21h) ou Checkers High St · Provisions Addo · ⚠️ Pas Woolworths (Visa refusé)</div></div>
+<div class="ar"><div class="ae">Knysna J10-J12</div><div class="av">Amazen Foods (083 782 1000) si besoin viande halal</div></div>
+<div class="stitle">Souvenirs recommandés</div>
+<div class="ar"><div class="ae">🍖 Stellenbosch</div><div class="av">Biltong (séché, nombreuses variétés) · Meilleure sélection · Acheter en quantité pour le voyage</div></div>
+<div class="ar"><div class="ae">🌿 Cederberg</div><div class="av">Rooibos en vrac (origine locale, qualité supérieure) · Disponible à Mount Ceder ou villages</div></div>
+<div class="ar"><div class="ae">🦜 Oudtshoorn</div><div class="av">Produits en cuir d'autruche (portefeuilles, sacs, ceintures) · Spécialité locale</div></div>
+<div class="ar"><div class="ae">🍷 Le Cap V&amp;A</div><div class="av">Vins de qualité · Biltong Baron · Artisanat Greenmarket Square (négocier -30-50%)</div></div>
+</div></div>
+
+<div class="ps" onclick="togglePratique(this)"><div class="ph"><span class="phi">🍽️</span><span class="pht">Restaurants halal par étape</span><span class="pha">›</span></div>
+<div class="pb">
+<div class="info">Règle générale : si halal non confirmé → choisir poisson/fruits de mer ou végétarien. Pas de fastfood, pas de cuisine indienne.</div>
+<div class="stitle" style="margin-top:10px">Stellenbosch</div>
+<div class="ri"><div class="rn">Hussar Grill</div><div class="rd">Steakhouse · Viande halal · Centre Stellenbosch</div></div>
+<div class="ri"><div class="rn">Alluvia Restaurant</div><div class="rd">Domaine viticole · Halal certifié · Déjeuner</div><div class="rt"><span class="tag tg">✅ Halal</span></div></div>
+<div class="stitle">Oudtshoorn</div>
+<div class="ri"><div class="rn">Halaal Café</div><div class="rd">Cuisine contemporaine · Entièrement halal</div><div class="rt"><span class="tag tg">✅ Halal certifié</span></div></div>
+<div class="ri"><div class="rn">Jemima's Restaurant</div><div class="rd">Cuisine sud-africaine · Bobotie · Terrasse</div></div>
+<div class="ri"><div class="rn">Headlines Restaurant</div><div class="rd">Cuisine à base d'autruche · Incontournable Oudtshoorn</div></div>
+<div class="ri"><div class="rn">Karoopot Restaurant</div><div class="rd">Cuisine Karoo · Filet d'autruche · Agneau Karoo</div></div>
+<div class="stitle">Knysna</div>
+<div class="ri"><div class="rn">The Drydock Food Co</div><div class="rd">Bord de lagon · Fruits de mer · Halal confirmé</div><div class="rt"><span class="tag tg">✅ Halal</span></div></div>
+<div class="ri"><div class="rn">Freshline Fisheries</div><div class="rd">Poissonnerie-resto · Ultra-frais · BYOB</div><div class="rt"><span class="tag ti">🐟 Poisson</span></div></div>
+<div class="ri"><div class="rn">34 Degrees South · Quays</div><div class="rd">Deli + vue lagon · Fruits de mer</div></div>
+<div class="stitle">Le Cap</div>
+<div class="ri"><div class="rn">Biesmiellah · Bo-Kaap</div><div class="rd">2 Wale St · Cape Malay depuis 1982 · Fermé dimanche</div><div class="rt"><span class="tag tg">✅ Halal certifié</span></div></div>
+<div class="ri"><div class="rn">Bo-Kaap Kombuis</div><div class="rd">7 August St · Cape Malay · Vue Table Mountain</div><div class="rt"><span class="tag tg">✅ Halal</span></div></div>
+<div class="ri"><div class="rn">Eastern Food Bazaar</div><div class="rd">96 Longmarket St · 10 cuisines · Tout halal</div><div class="rt"><span class="tag tg">✅ Halal</span></div></div>
+<div class="ri"><div class="rn">Conscious Carnivores · V&amp;A</div><div class="rd">Wagyu + Angus halal premium · V&amp;A Waterfront</div><div class="rt"><span class="tag tg">✅ Halal</span></div></div>
+</div></div>
+
+<div class="ps" onclick="togglePratique(this)"><div class="ph"><span class="phi">⚡</span><span class="pht">Load-shedding &amp; Électricité</span><span class="pha">›</span></div>
+<div class="pb">
+<div class="warn">Coupures électriques fréquentes en Afrique du Sud. Ladybird : générateur 19h-07h uniquement, pas de backup en journée.</div>
+<div class="ir"><div class="il">Équipement</div><div class="iv">Chargeur solaire 26 800mAh avec lampe torche intégrée ✅ · Powerbank backup ✅</div></div>
+<div class="ir"><div class="il">Adaptateurs</div><div class="iv">Type M (3 broches rondes) × 2 ✅</div></div>
+<div class="ir"><div class="il">Jumelles</div><div class="iv">Kelland · Safari, baleines, oiseaux ✅</div></div>
+<div class="ir"><div class="il">Support GPS</div><div class="iv">Support voiture ventouse + chargeur allume-cigare ✅</div></div>
+</div></div>
+
+<div class="ps" onclick="togglePratique(this)"><div class="ph"><span class="phi">🌡️</span><span class="pht">Météo &amp; Climat par étape</span><span class="pha">›</span></div>
+<div class="pb">
+<div class="mg">
+<div class="mch"><div class="mchl">Stellenbosch</div><div class="mcht">10-18°C</div><div class="mchd">Hiver doux, risque pluie</div></div>
+<div class="mch"><div class="mchl">Cederberg</div><div class="mcht">2-20°C</div><div class="mchd">Nuits très froides 2-5°C</div></div>
+<div class="mch"><div class="mchl">Oudtshoorn</div><div class="mcht">5-25°C</div><div class="mchd">Karoo, journées chaudes</div></div>
+<div class="mch"><div class="mchl">Addo</div><div class="mcht">10-22°C</div><div class="mchd">Brouillard matinal</div></div>
+<div class="mch"><div class="mchl">Garden Route</div><div class="mcht">12-18°C</div><div class="mchd">Humide, pluie possible</div></div>
+<div class="mch"><div class="mchl">Le Cap</div><div class="mcht">10-18°C</div><div class="mchd">Vent possible, variable</div></div>
+</div>
+<div class="info">Palette safari : marron, bleu sombre, kaki, beige, olive. Éviter rouge/orange pour Meerkat, Game Drive, randonnées.</div>
+<div class="moon">🌕 Pleine lune 30/06 · Meilleure nuit observation : 08/07 (lune 46%, se lève vers 23h)</div>
+</div></div>
+
+<div class="ps" onclick="togglePratique(this)"><div class="ph"><span class="phi">⚠️</span><span class="pht">Points de vigilance</span><span class="pha">›</span></div>
+<div class="pb">
+<div class="warn">Cederberg : vérifier statut accès (incendies/inondations CapeNature) avant le 26/06.</div>
+<div class="warn">Tsitsikamma : vérifier réouverture pont suspendu (travaux jusqu'au ~23/06) avant le 02/07.</div>
+<div class="warn">De Hoop : vérifier marée basse du 06/07 matin (app marées ou bureau réserve).</div>
+<div class="warn">Table Mountain : randonnées solo déconseillées (sécurité). Câble car uniquement. Vérifier météo la veille.</div>
+<div class="warn">Sécurité générale : ne jamais laisser objets de valeur visibles dans la voiture. Éviter conduite de nuit hors zones urbaines.</div>
+</div></div>
+
+</div>
+
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showScreen('planning',this)"><span class="nav-icon">🗓️</span>Planning</button>
+  <button class="nav-btn" onclick="showScreen('must',this)"><span class="nav-icon">⭐</span>À faire</button>
+  <button class="nav-btn" onclick="showScreen('lieux',this)"><span class="nav-icon">📍</span>Lieux</button>
+  <button class="nav-btn" onclick="showScreen('budget',this)"><span class="nav-icon">💰</span>Budget</button>
+  <button class="nav-btn" onclick="showScreen('pratique',this)"><span class="nav-icon">📋</span>Pratique</button>
+</nav>
+
+<script>
+const MUST_ITEMS=[
+{id:'m1',name:'Wine Tram Franschhoek',emoji:'🍷',jour:'J2 · 25/06',heure:'Matin',duree:'3-4h',statut:'todo',desc:"Le Wine Tram de Franschhoek traverse les domaines viticoles les plus emblématiques des Winelands. Réserver la veille ou le matin.",lieu:'Franschhoek',lien:'https://winetram.co.za',ll:'📅 Réserver'},
+{id:'m2',name:'La Petite Colombe · Dîner',emoji:'🍽️',jour:'J2 · 25/06',heure:'20h00',duree:'3h',statut:'reserved',desc:"Dîner gastronomique 6 plats à Leeu Estates, Franschhoek. ✅ Réservé · Dépôt R2010 payé. 1 guest poisson/végétarien uniquement. R1395pp.",lieu:'Franschhoek',lien:'tel:+27212023395',ll:'📞 Restaurant'},
+{id:'m3',name:'Seweweekspoort Pass',emoji:'⛰️',jour:'J5 · 28/06',heure:'En route',duree:'+1h arrêt',statut:'todo',desc:"Le plus beau tronçon de 18km de gravier d'Afrique du Sud. UNESCO. Sur la R323. Aller-retour dans le poort.",lieu:'Cederberg → Oudtshoorn',lien:'https://maps.app.goo.gl/t78moYz7WTCa7xLS9',ll:'🗺️ Maps'},
+{id:'m4',name:'Meerkat Safari',emoji:'🦦',jour:'J6 · 29/06',heure:'Aube',duree:'2h',statut:'reserved',desc:"✅ Réservé via Booking.com. R612pp (1 224 ZAR total). Cash sur place à Buffelsdrift.",lieu:'Oudtshoorn',lien:null,ll:null},
+{id:'m5',name:'Swartberg Pass (boucle)',emoji:'🏔️',jour:'J6 · 29/06',heure:'Après Meerkat',duree:'4-5h',statut:'todo',desc:"Boucle : Oudtshoorn → Cango Caves → Swartberg Pass → Prince Albert → R62 → Meiringspoort → Cango Wildlife. UNESCO. 27km gravel.",lieu:'Oudtshoorn',lien:'https://maps.google.com/?q=Swartberg+Pass+South+Africa',ll:'🗺️ Maps'},
+{id:'m6',name:'Cango Caves',emoji:'🕳️',jour:'J6 · 29/06',heure:'Matin',duree:'1h30',statut:'todo',desc:"Réseau de grottes avec stalactites et stalagmites spectaculaires. R328 nord d'Oudtshoorn. À faire à l'aller vers Swartberg Pass.",lieu:'Oudtshoorn',lien:'https://maps.google.com/?q=Cango+Caves+Oudtshoorn+South+Africa',ll:'🗺️ Maps'},
+{id:'m7',name:'Stargazing A2Zebra',emoji:'🔭',jour:'J5-J6 · 28-29/06',heure:'19h30',duree:'2h',statut:'reserved',desc:"✅ Réservé via WhatsApp A2Zebra Adventures. R750pp (1 500 ZAR total). 28 ou 29/06 selon météo.",lieu:'Oudtshoorn',lien:null,ll:null},
+{id:'m8',name:'Game Drive AfriCamps',emoji:'🚙',jour:'J8 · 01/07',heure:'7h30',duree:'3-4h',statut:'reserved',desc:"✅ Réservé via WhatsApp AfriCamps Addo. R1 950pp (3 900 ZAR total). Paiement sur place. Guide expert.",lieu:'Addo',lien:null,ll:null},
+{id:'m9',name:'Self-Drive Addo Main Camp',emoji:'🐘',jour:'J8 · 01/07',heure:'Après-midi',duree:'Demi-journée',statut:'todo',desc:"R492pp frais conservation/jour. Hapoor Dam, Underground Hide, Zuurkop Lookout, Grahams Pan. Carte gratuite à l'entrée.",lieu:'Addo',lien:'https://www.sanparks.org/parks/addo-elephant/rates-entry-fees',ll:'💶 Tarifs officiels'},
+{id:'m10',name:'The Big Tree Tsitsikamma',emoji:'🌳',jour:'J9 · 02/07',heure:'Matin',duree:'1h-2h',statut:'todo',desc:"Grand Yellowwood dans la forêt primaire. Circuits rouge (4.2km), jaune (2.6km), vert (1km). Forestry Office, Storms River Village.",lieu:'Tsitsikamma',lien:'https://maps.app.goo.gl/bQhgnQBPHTaLqSfk9',ll:'🗺️ Maps'},
+{id:'m11',name:'Pont suspendu Storms River',emoji:'🌉',jour:'J9 · 02/07',heure:'Matin',duree:'1h30-2h',statut:'todo',desc:"Pont de 77m, grottes Khoisan, boardwalk forêt. ~R326pp. ⚠️ Vérifier réouverture après travaux (~23/06) avant le 02/07.",lieu:'Tsitsikamma',lien:'https://www.sanparks.org/parks/garden-route',ll:'🌐 SANParks'},
+{id:'m12',name:'Bloukrans Bridge',emoji:'🌁',jour:'J9 · 02/07',heure:'En route',duree:'30min',statut:'todo',desc:"Plus haut pont bungee d'Afrique (216m). Arrêt rapide spectaculaire même sans sauter. Sur la N2.",lieu:'Garden Route',lien:'https://maps.google.com/?q=Bloukrans+Bridge+South+Africa',ll:'🗺️ Maps'},
+{id:'m13',name:"Nature's Valley · Village caché",emoji:'🏖️',jour:'J9 · 02/07',heure:'En route',duree:'30min',statut:'todo',desc:"Village caché entre Tsitsikamma et Knysna. Plage sauvage magnifique, lagune, forêt. Sur la R102. Arrêt 30min.",lieu:'Garden Route',lien:'https://maps.google.com/?q=Natures+Valley+Garden+Route+South+Africa',ll:'🗺️ Maps'},
+{id:'m14',name:'The Gap · Robberg',emoji:'🦭',jour:'J9 · 02/07',heure:'Après-midi',duree:'1h30-2h',statut:'todo',desc:"Péninsule sauvage de Plettenberg Bay. Lions de mer, baleines en juillet. Sur le trajet J9 vers Knysna. Vues spectaculaires.",lieu:'Garden Route',lien:'https://maps.google.com/?q=Robberg+Nature+Reserve+South+Africa',ll:'🗺️ Maps'},
+{id:'m15',name:'Kayak lagon Knysna',emoji:'🚣',jour:'J10 · 03/07',heure:'Matin',duree:'2-3h',statut:'todo',desc:"Si beau temps. 🌧️ Alternative : Huîtres Waterfront + Eastern Head Viewpoint.",lieu:'Knysna',lien:null,ll:null},
+{id:'m16',name:'Huîtres · Knysna Waterfront',emoji:'🦪',jour:'J10-J12',heure:'Midi',duree:'1h',statut:'todo',desc:"Pleine saison juillet. Huîtres Knysna réputées mondialement. Knysna Quays Waterfront.",lieu:'Knysna',lien:null,ll:null},
+{id:'m17',name:'Map of Africa Viewpoint',emoji:'🗺️',jour:'J12 · 05/07',heure:'En route',duree:'30min',statut:'todo',desc:"Embouchure rivières Kaaimans + Touws formant la silhouette de l'Afrique. Courte marche depuis parking.",lieu:'Wilderness',lien:'https://maps.google.com/?q=Map+of+Africa+Viewpoint+Wilderness+South+Africa',ll:'🗺️ Maps'},
+{id:'m18',name:'Koppie Alleen · Baleines',emoji:'🐋',jour:'J13 · 06/07',heure:'~10h30',duree:'2h',statut:'todo',desc:"De Hoop Nature Reserve. Juillet = début saison baleines à bosse. Hautes dunes + boardwalk. Idéal à marée basse. 25min depuis l'entrée.",lieu:'De Hoop',lien:'https://maps.google.com/?q=Koppie+Alleen+De+Hoop+South+Africa',ll:'🗺️ Maps'},
+{id:'m19',name:'Arniston · Village de pêcheurs',emoji:'🏘️',jour:'J14 · 07/07',heure:'En route',duree:'30min',statut:'todo',desc:"Village de pêcheurs blanc à la chaux classé monument national. Maisons traditionnelles uniques. Absolument à voir. Détour +30min.",lieu:'Route côtière',lien:'https://maps.google.com/?q=Arniston+South+Africa',ll:'🗺️ Maps'},
+{id:'m20',name:'Cap Agulhas',emoji:'🌍',jour:'J14 · 07/07',heure:'En route',duree:'30min',statut:'todo',desc:"Pointe la plus méridionale d'Afrique. Frontière officielle Atlantique/Indien. Phare historique. Détour +20min.",lieu:'Route côtière',lien:'https://maps.google.com/?q=Cape+Agulhas+South+Africa',ll:'🗺️ Maps'},
+{id:'m21',name:'Hermanus · Baleines côtières',emoji:'🐋',jour:'J14 · 07/07',heure:'En route',duree:'30-45min',statut:'todo',desc:"Capitale mondiale de l'observation des baleines depuis la côte. Cliff Walk gratuit sur Walker Bay. Juillet = bonne saison.",lieu:'Route côtière',lien:'https://maps.google.com/?q=Hermanus+Cliff+Walk+South+Africa',ll:'🗺️ Maps'},
+{id:'m22',name:'Boulders Beach · Manchots',emoji:'🐧',jour:'J15 · 08/07',heure:'8h00',duree:'1h30',statut:'todo',desc:"Arriver tôt pour éviter la foule. Colonie de manchots africains unique. Simon's Town.",lieu:'Le Cap',lien:'https://maps.google.com/?q=Boulders+Beach+Penguins+South+Africa',ll:'🗺️ Maps'},
+{id:'m23',name:"Cape Point + Cape of Good Hope",emoji:'🏔️',jour:'J15 · 08/07',heure:'Matin',duree:'2h',statut:'todo',desc:"Réserve 7750ha. Funiculaire Flying Dutchman. ⚠️ Babouins agressifs — ne pas nourrir ni approcher.",lieu:'Le Cap',lien:'https://maps.google.com/?q=Cape+Point+South+Africa',ll:'🗺️ Maps'},
+{id:'m24',name:"Bo-Kaap + Kramat",emoji:'🕌',jour:'J15 · 08/07',heure:'Après-midi',duree:'1h30',statut:'todo',desc:"Maisons colorées Cape Malay. Kramat de Sheikh Mohamed Hassen Ghaibie Shah : mausolée islamique historique Cape Malay.",lieu:'Le Cap',lien:'https://maps.google.com/?q=Bo-Kaap+Cape+Town+South+Africa',ll:'🗺️ Maps'},
+{id:'m25',name:'Signal Hill · Coucher de soleil + Ciel',emoji:'🌅',jour:'J15 · 08/07',heure:'~17h30',duree:'2-3h',statut:'todo',desc:"Meilleure nuit observation du voyage (lune 46%). Arriver 1h avant coucher de soleil. Rester jusqu'à 22h-23h pour la Voie Lactée.",lieu:'Le Cap',lien:'https://maps.google.com/?q=Signal+Hill+Cape+Town',ll:'🗺️ Maps'},
+{id:'m26',name:'Table Mountain · Câble car',emoji:'🏔️',jour:'J15-J16',heure:'Option météo',duree:'2-3h',statut:'option',desc:"Câble car uniquement (sécurité). Vérifier météo la veille. Visites guidées gratuites 30min toutes les heures 9h-15h.",lieu:'Le Cap',lien:'https://www.tablemountain.net',ll:'🌐 Réserver/Vérifier'},
+];
+
+const LIEUX_DATA=[
+{id:'l1',name:'Ladybird Boutique Hotel',emoji:'🏨',type:'Hébergement',etape:'Stellenbosch',desc:'Hôtel boutique vignobles R44. Petit-déjeuner inclus, restaurant 7h-20h, WiFi. Générateur nuit uniquement 19h-07h.',gps:'-33.8456350, 18.8623890',maps:'https://maps.app.goo.gl/MoPtY8uF8faywNaC8',infos:'143€ · 24-26/06 · Check-in 15h-21h'},
+{id:'l2',name:'Dorp Street',emoji:'🏛️',type:'Culture',etape:'Stellenbosch',desc:'Rue la plus historique d\'Afrique du Sud. Architecture Cape Dutch remarquable. Accessible à pied depuis le centre.',gps:'-33.9347, 18.8614',maps:'https://maps.google.com/?q=Dorp+Street+Stellenbosch+South+Africa',infos:'Gratuit · 30-60min'},
+{id:'l3',name:'Village Museum',emoji:'🏘️',type:'Culture',etape:'Stellenbosch',desc:'4 maisons historiques restaurées du 17e au 19e siècle.',gps:'-33.9352, 18.8631',maps:'https://maps.google.com/?q=Village+Museum+Stellenbosch+South+Africa',infos:'Entrée modique · 1h'},
+{id:'l4',name:'Franschhoek',emoji:'🍷',type:'Gastronomie',etape:'Stellenbosch',desc:'Capitale gastronomique d\'Afrique du Sud. Wine Tram + La Petite Colombe réservé le 25/06 à 20h.',gps:'-33.9140, 19.1230',maps:'https://maps.google.com/?q=Franschhoek+South+Africa',infos:'J2 · 25/06'},
+{id:'l5',name:'Mount Ceder Lodge',emoji:'🏕️',type:'Hébergement',etape:'Cederberg',desc:'Lodge au cœur du Cederberg. Barbecue + ustensiles disponibles. Bois à acheter à la réception (interdit d\'apporter). Light lunch 11h-16h sans résa.',gps:'-32.6484630, 19.4086010',maps:'https://maps.app.goo.gl/LcY6XjUd1itLJK7Q6',infos:'199€ · 26-28/06 · Check-in 14h-17h'},
+{id:'l6',name:'Pakhuis Pass',emoji:'🏔️',type:'Paysage',etape:'Cederberg',desc:'Col scénique sur la R303 d\'accès à Mount Ceder. Vue spectaculaire sur le massif.',gps:'-32.2200, 19.0600',maps:'https://maps.google.com/?q=Pakhuis+Pass+Cederberg+South+Africa',infos:'En route J3 · Arrêt 15min'},
+{id:'l7',name:'Sevilla Rock Art Trail',emoji:'🎨',type:'Randonnée',etape:'Cederberg',desc:'Sentier autoguidé 5km avec 9 sites d\'art rupestre San préservés. Accessible sans permis spécifique.',gps:'-32.2270, 19.0560',maps:'https://maps.google.com/?q=Sevilla+Rock+Art+Trail+Cederberg+South+Africa',infos:'Modéré · 5km · 2h'},
+{id:'l8',name:"Lot's Wife & Window Rocks",emoji:'🪨',type:'Randonnée',etape:'Cederberg',desc:'Formations rocheuses spectaculaires. Randonnée modérée ~4km, 1h30. Depuis Kromrivier.',gps:'-32.4500, 19.2200',maps:'https://maps.google.com/?q=Lots+Wife+Cederberg+South+Africa',infos:'Modéré · 4km · 1h30'},
+{id:'l9',name:'Stadsaal Caves + Rock Art',emoji:'🕳️',type:'Nature',etape:'Cederberg',desc:'Grottes de grès spectaculaires avec galeries naturelles et art rupestre San adjacent.',gps:'-32.4350, 19.2150',maps:'https://maps.google.com/?q=Stadsaal+Caves+Cederberg+South+Africa',infos:'Court détour · 1h'},
+{id:'l10',name:'Maalgat Rock Pool',emoji:'💧',type:'Nature',etape:'Cederberg',desc:'Piscine naturelle dans un cadre rocheux. Court détour sympa.',gps:'-32.4000, 19.1900',maps:'https://maps.google.com/?q=Maalgat+Rock+Pool+Cederberg+South+Africa',infos:'Option · Court arrêt'},
+{id:'l11',name:'Rooidam Lookout + Truitjieskraal',emoji:'👁️',type:'Paysage',etape:'Cederberg',desc:'Points de vue panoramiques sur le massif Cederberg. Accessibles en voiture.',gps:'-32.4600, 19.2000',maps:'https://maps.google.com/?q=Rooidam+Lookout+Cederberg+South+Africa',infos:'Accessible voiture'},
+{id:'l12',name:'De Zeekoe Guest Farm',emoji:'🏡',type:'Hébergement',etape:'Oudtshoorn',desc:'Ferme authentique sur un lac. Petit-déjeuner inclus, dîner dès 18h. Parking + WiFi.',gps:'-33.6302650, 22.1555680',maps:'https://maps.app.goo.gl/NiFiGprGQegWJ6ip6',infos:'261€ · 28-30/06 · Check-in 14h-18h'},
+{id:'l13',name:'Seweweekspoort Pass',emoji:'⛰️',type:'Paysage',etape:'Oudtshoorn',desc:'Le plus beau tronçon de 18km de gravier d\'Afrique du Sud. UNESCO. Sur le trajet Mount Ceder → Oudtshoorn via R323.',gps:'-33.4811, 21.4591',maps:'https://maps.google.com/?q=Seweweekspoort+Pass+South+Africa',infos:'J5 · En route · +1h arrêt'},
+{id:'l14',name:'Grottes du Cango',emoji:'🕳️',type:'Culture',etape:'Oudtshoorn',desc:'Réseau de grottes spectaculaires. R328 nord d\'Oudtshoorn. À faire à l\'aller vers Swartberg Pass le J6.',gps:'-33.3750, 22.2130',maps:'https://maps.google.com/?q=Cango+Caves+Oudtshoorn+South+Africa',infos:'J6 · Matin · 1h30'},
+{id:'l15',name:'Swartberg Pass',emoji:'🏔️',type:'Paysage',etape:'Oudtshoorn',desc:'Pass légendaire UNESCO. 27km gravel jusqu\'à 1585m. Boucle : Cango Caves → Swartberg → Meiringspoort → Cango Wildlife.',gps:'-33.3500, 22.2300',maps:'https://maps.google.com/?q=Swartberg+Pass+South+Africa',infos:'J6 · 4-5h boucle'},
+{id:'l16',name:'Meiringspoort + Waterfall',emoji:'💧',type:'Paysage',etape:'Oudtshoorn',desc:'Gorge spectaculaire R62. Falaises verticales, rivière, cascade. Au retour de la boucle Swartberg.',gps:'-33.4500, 22.3500',maps:'https://maps.google.com/?q=Meiringspoort+Karoo+South+Africa',infos:'J6 · Retour boucle · 30min'},
+{id:'l17',name:'Cango Wildlife Ranch',emoji:'🐆',type:'Safari',etape:'Oudtshoorn',desc:'Ranch avec guépards et animaux exotiques. Au retour de la boucle Swartberg.',gps:'-33.3800, 22.2200',maps:'https://maps.google.com/?q=Cango+Wildlife+Ranch+Oudtshoorn',infos:'J6 · 1h'},
+{id:'l18',name:'Meerkat Adventures · Buffelsdrift',emoji:'🦦',type:'Safari',etape:'Oudtshoorn',desc:'Safari Meerkat à l\'aube. ✅ Réservé. R612pp · Cash sur place. Max 2 véhicules/jour.',gps:'-33.5500, 22.0500',maps:'https://maps.google.com/?q=Buffelsdrift+Game+Lodge+Oudtshoorn',infos:'J6 · Aube · ✅ Réservé'},
+{id:'l19',name:'AfriCamps Addo',emoji:'⛺',type:'Hébergement',etape:'Addo',desc:'Tentes premium. Bois, eau, allume-feu réception 24h. App AC Addo : breakfast + braai basket (connexion requise).',gps:'-33.3920340, 25.7227430',maps:'https://maps.app.goo.gl/2ts62yXGkDtsTPho6',infos:'449€ · 30/06-02/07 · Check-in 14h-16h30'},
+{id:'l20',name:'Addo Main Camp · Entrée',emoji:'🐘',type:'Safari',etape:'Addo',desc:'Entrée principale Addo Elephant Park. R492pp frais conservation. Carte gratuite à l\'entrée. Seule station-service du parc ici.',gps:'-33.4838, 25.7505',maps:'https://maps.google.com/?q=Addo+Elephant+National+Park+Main+Camp',infos:'R492pp/jour · Vérifier horaires hiver'},
+{id:'l21',name:'Underground Hide · Addo',emoji:'👁️',type:'Safari',etape:'Addo',desc:'Affût souterrain unique pour observer les animaux au point d\'eau. Gratuit avec l\'entrée du parc. Vue imprenable sur les éléphants.',gps:'-33.4838, 25.7505',maps:'https://maps.google.com/?q=Addo+Main+Camp+Underground+Hide',infos:'Inclus avec entrée · Incontournable'},
+{id:'l22',name:'Hapoor Dam + Points d\'eau Addo',emoji:'🐘',type:'Safari',etape:'Addo',desc:'Hapoor Dam, Woodlands, Ngulube, Lismore, Peasland : points d\'eau du parc. Zone forte concentration éléphants.',gps:'-33.4750, 25.7350',maps:'https://maps.google.com/?q=Hapoor+Dam+Addo+Elephant+Park',infos:'Self-drive · Priorité'},
+{id:'l23',name:'Zuurkop + Grahams Pan · Addo',emoji:'👁️',type:'Safari',etape:'Addo',desc:'Points de vue panoramiques dans le parc Addo. Bons spots pour repérer les animaux depuis les hauteurs.',gps:'-33.4700, 25.7200',maps:'https://maps.google.com/?q=Zuurkop+Addo+Elephant+Park',infos:'Self-drive'},
+{id:'l24',name:'The Big Tree Tsitsikamma',emoji:'🌳',type:'Nature',etape:'Garden Route',desc:'Grand Yellowwood forêt primaire. Circuits rouge 4.2km, jaune 2.6km, vert 1km. Forestry Office, Storms River Village.',gps:'-33.9700, 23.8800',maps:'https://maps.app.goo.gl/bQhgnQBPHTaLqSfk9',infos:'J9 · Matin · 1h-2h'},
+{id:'l25',name:'Pont suspendu · Storms River',emoji:'🌉',type:'Aventure',etape:'Garden Route',desc:'Pont 77m embouchure Storms River. Grottes Khoisan, boardwalk forêt. ⚠️ Vérifier réouverture travaux (~23/06).',gps:'-34.0219, 23.8966',maps:'https://maps.app.goo.gl/gMPjHbW7KKL22QzU9',infos:'J9 · ~R326pp · 1h30-2h'},
+{id:'l26',name:'Bloukrans Bridge',emoji:'🌁',type:'Paysage',etape:'Garden Route',desc:'Plus haut pont bungee d\'Afrique (216m). Arrêt rapide spectaculaire. Sur la N2.',gps:'-33.9620, 23.6500',maps:'https://maps.google.com/?q=Bloukrans+Bridge+South+Africa',infos:'J9 · 30min'},
+{id:'l27',name:"Nature's Valley",emoji:'🏖️',type:'Nature',etape:'Garden Route',desc:'Village caché entre Tsitsikamma et Knysna. Plage sauvage magnifique, lagune, forêt. Sur la R102.',gps:'-33.9700, 23.5600',maps:'https://maps.google.com/?q=Natures+Valley+Garden+Route+South+Africa',infos:'J9 · 30min · Sur R102'},
+{id:'l28',name:'The Gap · Robberg',emoji:'🦭',type:'Nature',etape:'Garden Route',desc:'Péninsule sauvage Plettenberg Bay. Lions de mer, baleines en juillet. Marche 1h-2h.',gps:'-34.0900, 23.3800',maps:'https://maps.google.com/?q=Robberg+Nature+Reserve+South+Africa',infos:'J9 · Après-midi · 1h-2h'},
+{id:'l29',name:'Forest Valley Cottages',emoji:'🌿',type:'Hébergement',etape:'Knysna',desc:'Cottages en forêt à Rheenendal (~25min centre Knysna). Parking inclus.',gps:'-34.0352520, 22.9726370',maps:'https://maps.app.goo.gl/yBRa9meJvZ5QSpyq5',infos:'517€ · 02-05/07 · Check-in 14h-18h'},
+{id:'l30',name:'Eastern Head Viewpoint',emoji:'👁️',type:'Paysage',etape:'Knysna',desc:'Vue panoramique sur les Heads de Knysna et le lagon. Gratuit, accessible en voiture. Observation baleines en juillet.',gps:'-34.0825, 23.0658',maps:'https://maps.google.com/?q=Knysna+Heads+East+Head+Viewpoint+South+Africa',infos:'Gratuit · Accessible voiture'},
+{id:'l31',name:'The Bay Deck · Knysna',emoji:'🌊',type:'Paysage',etape:'Knysna',desc:'Point de vue sur la baie de Knysna. Belle perspective sur le lagon et les Heads.',gps:'-34.0500, 23.0500',maps:'https://maps.google.com/?q=The+Bay+Deck+Knysna+South+Africa',infos:'Vue lagon'},
+{id:'l32',name:'Garden of Eden',emoji:'🌳',type:'Nature',etape:'Knysna',desc:'Boardwalk en bois facile à travers forêt indigène. ~5km. Sur la N2.',gps:'-33.9716, 23.3416',maps:'https://maps.google.com/?q=Garden+of+Eden+Knysna+South+Africa',infos:'Facile · 5km · 1h30'},
+{id:'l33',name:'Thesen Islands + Bollards Bay',emoji:'🏝️',type:'Paysage',etape:'Knysna',desc:'19 îles artificielles reliées par ponts. Architecture coloniale maritime. Bollards Bay : plage calme.',gps:'-34.0590, 23.0480',maps:'https://maps.google.com/?q=Thesen+Islands+Knysna+South+Africa',infos:'1h30'},
+{id:'l34',name:'Brenton-on-Sea',emoji:'🏖️',type:'Plage',etape:'Knysna',desc:'Plage sauvage + marche côtière. ~15min de Knysna.',gps:'-34.0680, 22.9530',maps:'https://maps.google.com/?q=Brenton+on+Sea+South+Africa',infos:'~15min de Knysna'},
+{id:'l35',name:'Dolphin Dunes Guesthouse',emoji:'🏠',type:'Hébergement',etape:'Wilderness',desc:'Guesthouse confortable. Petit-déjeuner inclus, parking, WiFi.',gps:'-33.9977220, 22.6038870',maps:'https://maps.app.goo.gl/dzrRnnusKQcniijS9',infos:'60€ · 05-06/07 · Check-in 14h-17h'},
+{id:'l36',name:'Map of Africa Viewpoint',emoji:'🗺️',type:'Paysage',etape:'Wilderness',desc:'Vue des rivières Kaaimans + Touws formant le contour de l\'Afrique. ~20min de Wilderness.',gps:'-33.9890, 22.6280',maps:'https://maps.google.com/?q=Map+of+Africa+Viewpoint+Wilderness+South+Africa',infos:'J12 · 30min'},
+{id:'l37',name:'Dolphin Point + Gwarrie Pan',emoji:'🐬',type:'Paysage',etape:'Wilderness',desc:'Sommet col Kaaimans. Vue panoramique, baleines et dauphins en juillet.',gps:'-33.9950, 22.5950',maps:'https://maps.google.com/?q=Dolphin+Point+Wilderness+South+Africa',infos:'Vue panoramique'},
+{id:'l38',name:'Wilderness Beach + Victoria Bay',emoji:'🏖️',type:'Plage',etape:'Wilderness',desc:'Plage principale Wilderness. Victoria Bay : 15min, baie en fer à cheval.',gps:'-33.9989, 22.5950',maps:'https://maps.google.com/?q=Wilderness+Beach+South+Africa',infos:'Option · 1h30'},
+{id:'l39',name:'Arumvale Country Retreat',emoji:'🌺',type:'Hébergement',etape:'Swellendam',desc:'Retreat en vallée verdoyante. Parking + WiFi inclus.',gps:'-34.0166770, 20.4236590',maps:'https://maps.app.goo.gl/9uPSRp3iSrCTbe3n9',infos:'70€ · 06-07/07 · Check-in 14h-20h'},
+{id:'l40',name:'De Hoop Nature Reserve',emoji:'🐋',type:'Nature',etape:'De Hoop',desc:'Réserve 36 000ha. Juillet = début saison baleines à bosse. Porte ouvre à 7h. Koppie Alleen à 25min de l\'entrée.',gps:'-34.4216, 20.4087',maps:'https://maps.google.com/?q=De+Hoop+Nature+Reserve+South+Africa',infos:'J13 · Porte 7h-18h'},
+{id:'l41',name:'Koppie Alleen Beach',emoji:'🐋',type:'Nature',etape:'De Hoop',desc:'Point de vue principal De Hoop pour les baleines. Hautes dunes, boardwalk. Idéal à marée basse.',gps:'-34.4759, 20.5087',maps:'https://maps.google.com/?q=-34.4759,20.5087',infos:'J13 · ~10h30 · 2h'},
+{id:'l42',name:'Drostdy Museum · Swellendam',emoji:'🏛️',type:'Culture',etape:'Swellendam',desc:'Musée historique de Swellendam. Architecture coloniale hollandaise. Voortrek Street.',gps:'-34.0220, 20.4430',maps:'https://maps.google.com/?q=Drostdy+Museum+Swellendam+South+Africa',infos:'J13 · Après-midi'},
+{id:'l43',name:'Réserve naturelle Marloth',emoji:'🌿',type:'Nature',etape:'Swellendam',desc:'Réserve adjacente Swellendam. Randonnées courtes, faune locale, oiseaux.',gps:'-33.9800, 20.4300',maps:'https://maps.google.com/?q=Marloth+Nature+Reserve+Swellendam+South+Africa',infos:'Option J13 après-midi'},
+{id:'l44',name:'Parc national des Bonteboks',emoji:'🦌',type:'Safari',etape:'Swellendam',desc:'6km de Swellendam. Self-drive. Bontebok, zèbre des montagnes, 200+ oiseaux. Ouverture 7h, fermeture 18h hiver.',gps:'-34.0539, 20.4293',maps:'https://maps.google.com/?q=Bontebok+National+Park+South+Africa',infos:'J14 · Option 7h-9h · Tarif sur place'},
+{id:'l45',name:'The Trade Boutique Hotel',emoji:'🏙️',type:'Hébergement',etape:'Le Cap',desc:'Hôtel boutique CBD Cape Town. Petit-déjeuner inclus. Parking R250/nuit réservé via Booking.com.',gps:'-33.9214410, 18.4187670',maps:'https://maps.app.goo.gl/XCiaWBkfkQmELzHq7',infos:'223€ · 07-09/07 · Check-in 14h-23h30'},
+{id:'l46',name:'Signal Hill',emoji:'🌅',type:'Paysage',etape:'Le Cap',desc:'Vue panoramique Cape Town + Table Bay. Coucher de soleil + meilleure nuit observation voyage (08/07, lune 46%). Arriver 1h avant sunset.',gps:'-33.9180, 18.4019',maps:'https://maps.google.com/?q=Signal+Hill+Cape+Town+South+Africa',infos:'J15 · 08/07 · ~17h30 · Lune 46%'},
+{id:'l47',name:'Boulders Beach · Manchots',emoji:'🐧',type:'Nature',etape:'Le Cap',desc:'Colonie de manchots africains. Arriver à 8h. Simon\'s Town. Sur le trajet vers Cape Point.',gps:'-34.1970, 18.4510',maps:'https://maps.google.com/?q=Boulders+Beach+Penguins+South+Africa',infos:'J15 · 8h · 1h30'},
+{id:'l48',name:'Cape Point + Cape of Good Hope',emoji:'🏔️',type:'Paysage',etape:'Le Cap',desc:'Réserve 7750ha. Funiculaire Flying Dutchman. Buffels Bay pique-nique. ⚠️ Babouins — ne pas nourrir.',gps:'-34.3568, 18.4970',maps:'https://maps.google.com/?q=Cape+Point+South+Africa',infos:'J15 · Matin · 2h'},
+{id:'l49',name:"Chapman's Peak Drive",emoji:'🌊',type:'Paysage',etape:'Le Cap',desc:'Route panoramique taillée dans la falaise. Vue Hout Bay. Péage ~R60.',gps:'-34.0950, 18.3650',maps:'https://maps.google.com/?q=Chapmans+Peak+Drive+South+Africa',infos:'J15 · Midi · Péage R60'},
+{id:'l50',name:'Bo-Kaap + Kramat',emoji:'🕌',type:'Culture',etape:'Le Cap',desc:'Maisons colorées Cape Malay. Kramat : mausolée islamique historique, lieu de pèlerinage Cape Malay. Restaurants halal.',gps:'-33.9240, 18.4130',maps:'https://maps.google.com/?q=Bo-Kaap+Cape+Town+South+Africa',infos:'J15 · Après-midi'},
+{id:'l51',name:'V&A Waterfront + Greenmarket',emoji:'🛍️',type:'Shopping',etape:'Le Cap',desc:'V&A : Biltong Baron, vins, artisanat, restaurants. Greenmarket : négocier -30-50%. Derniers achats J16.',gps:'-33.9039, 18.4190',maps:'https://maps.google.com/?q=VA+Waterfront+Cape+Town+South+Africa',infos:'J16 · Dernier matin'},
+{id:'l52',name:'Camps Bay + Viewpoint',emoji:'🏖️',type:'Plage',etape:'Le Cap',desc:'Plage emblématique avec vue Twelve Apostles. Restaurants front de mer. Point de vue adjacent.',gps:'-33.9500, 18.3760',maps:'https://maps.google.com/?q=Camps+Bay+Cape+Town+South+Africa',infos:'Option'},
+{id:'l53',name:'Green Point · Promenade',emoji:'🌳',type:'Paysage',etape:'Le Cap',desc:'Parc vert entre V&A Waterfront et Sea Point. Promenade côtière, phare historique. Proche de The Trade.',gps:'-33.9020, 18.4050',maps:'https://maps.google.com/?q=Green+Point+Cape+Town+South+Africa',infos:'Proche hôtel · Gratuit'},
+{id:'l54',name:'Kirstenbosch Botanical Garden',emoji:'🌺',type:'Nature',etape:'Le Cap',desc:'Jardins botaniques nationaux sur pentes Table Mountain. Fynbos, protées, vue Table Mountain.',gps:'-33.9881, 18.4326',maps:'https://maps.google.com/?q=Kirstenbosch+Botanical+Garden+South+Africa',infos:'Option · 2h'},
+{id:'l55',name:'Rhodes Memorial',emoji:'🏛️',type:'Culture',etape:'Le Cap',desc:'Mémorial historique sur Devil\'s Peak. Vue Cape Town et Cap Flats. Accessible en voiture.',gps:'-33.9500, 18.4600',maps:'https://maps.google.com/?q=Rhodes+Memorial+Cape+Town+South+Africa',infos:'Option'},
+{id:'l56',name:'Arniston · Village de pêcheurs',emoji:'🏘️',type:'Culture',etape:'Route côtière',desc:'Village de pêcheurs blanc à la chaux classé monument national. Maisons traditionnelles uniques. Absolument à voir. Détour +30min.',gps:'-34.6700, 20.0300',maps:'https://maps.google.com/?q=Arniston+South+Africa',infos:'J14 · En route · 30min'},
+{id:'l57',name:'Cap Agulhas',emoji:'🌍',type:'Culture',etape:'Route côtière',desc:'Pointe la plus méridionale d\'Afrique. Frontière officielle Atlantique/Indien. Phare historique. Détour +20min.',gps:'-34.8358, 20.0011',maps:'https://maps.google.com/?q=Cape+Agulhas+South+Africa',infos:'J14 · En route · Incontournable'},
+{id:'l58',name:'Hermanus · Cliff Walk',emoji:'🐋',type:'Nature',etape:'Route côtière',desc:'Capitale mondiale observation baleines depuis côte. Cliff Walk gratuit Walker Bay. Juillet = bonne saison.',gps:'-34.4140, 19.2360',maps:'https://maps.google.com/?q=Hermanus+Cliff+Walk+South+Africa',infos:'J14 · En route · 30-45min'},
+{id:'l59',name:"Betty's Bay · Stony Point",emoji:'🐧',type:'Nature',etape:'Route côtière',desc:'Colonie manchots moins touristique que Boulders Beach. Sur R44.',gps:'-34.3640, 18.9080',maps:'https://maps.google.com/?q=Stony+Point+Bettys+Bay+South+Africa',infos:'J14 · En route R44'},
+];
+
+const ETAPES=['Stellenbosch','Cederberg','Oudtshoorn','Addo','Garden Route','Knysna','Wilderness','De Hoop','Swellendam','Le Cap','Route côtière'];
+let mustChecked=JSON.parse(localStorage.getItem('sa_must_v2')||'{}');
+let mustExpanded={};
+let lieux_filter='Tous';
+
+function init(){renderMust();renderFilters();renderLieuxList('','Tous');}
+
+function showScreen(id,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toggleDay(el){el.classList.toggle('open');}
+function togglePratique(el){el.classList.toggle('open');}
+
+function renderMust(){
+  const c=document.getElementById('must-list');
+  if(!c)return;
+  c.innerHTML='';
+  const sm={reserved:'✅ Réservé',todo:'🔵 À faire',option:'⬜ Option'};
+  const sc={reserved:'sr',todo:'st',option:'so'};
+  MUST_ITEMS.forEach(item=>{
+    const checked=mustChecked[item.id]||false;
+    const expanded=mustExpanded[item.id]||false;
+    const d=document.createElement('div');
+    d.className='mi'+(checked?' checked':'')+(expanded?' expanded':'');
+    d.innerHTML=`<div class="mh" onclick="toggleMustExpand('${item.id}',event)">
+      <div class="mc" onclick="toggleMustCheck('${item.id}',event)">${checked?'✓':''}</div>
+      <div class="mco"><div class="mn">${item.emoji} ${item.name}</div><div class="mm">${item.jour} · ${item.heure} · ⏱ ${item.duree}</div></div>
+      <span class="ms ${sc[item.statut]}">${sm[item.statut]}</span>
+    </div>
+    <div class="md">
+      <div class="mdesc">${item.desc}</div>
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">
+        <span class="tag ti">📍 ${item.lieu}</span>
+        ${item.lien?`<a class="lb" href="${item.lien}" target="_blank">${item.ll}</a>`:''}
+        <span class="lb" onclick="goToLieu('${item.id}')">📍 Voir dans Lieux</span>
+      </div>
+    </div>`;
+    c.appendChild(d);
+  });
+}
+
+function toggleMustCheck(id,e){
+  e.stopPropagation();
+  mustChecked[id]=!mustChecked[id];
+  localStorage.setItem('sa_must_v2',JSON.stringify(mustChecked));
+  renderMust();
+}
+
+function toggleMustExpand(id,e){
+  mustExpanded[id]=!mustExpanded[id];
+  renderMust();
+}
+
+function goToLieu(mustId){
+  const item=MUST_ITEMS.find(m=>m.id===mustId);
+  if(!item)return;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-lieux').classList.add('active');
+  document.querySelectorAll('.nav-btn')[2].classList.add('active');
+  const sb=document.getElementById('lieu-search');
+  if(sb){sb.value=item.name.substring(0,20);filterLieux();}
+  window.scrollTo(0,0);
+}
+
+function renderFilters(){
+  const row=document.getElementById('filter-row');
+  if(!row)return;
+  row.innerHTML='';
+  ['Tous',...ETAPES].forEach(e=>{
+    const p=document.createElement('div');
+    p.className='fp'+(e===lieux_filter?' active':'');
+    p.textContent=e;
+    p.onclick=()=>{lieux_filter=e;renderFilters();filterLieux();};
+    row.appendChild(p);
+  });
+}
+
+function filterLieux(){
+  const q=(document.getElementById('lieu-search')||{}).value||'';
+  renderLieuxList(q.toLowerCase(),lieux_filter);
+}
+
+function renderLieuxList(q,ef){
+  const c=document.getElementById('lieux-list');
+  if(!c)return;
+  c.innerHTML='';
+  const filtered=LIEUX_DATA.filter(l=>{
+    const mq=!q||l.name.toLowerCase().includes(q)||l.desc.toLowerCase().includes(q)||l.etape.toLowerCase().includes(q);
+    const me=ef==='Tous'||l.etape===ef;
+    return mq&&me;
+  });
+  if(!filtered.length){c.innerHTML='<div class="empty">Aucun lieu trouvé</div>';return;}
+  const grouped={};
+  filtered.forEach(l=>{if(!grouped[l.etape])grouped[l.etape]=[];grouped[l.etape].push(l);});
+  Object.keys(grouped).forEach(etape=>{
+    const s=document.createElement('div');
+    s.className='es';
+    s.innerHTML=`<div class="stitle">📌 ${etape}</div>`;
+    grouped[etape].forEach(lieu=>{
+      const el=document.createElement('div');
+      el.className='li';
+      el.id='lieu-'+lieu.id;
+      el.innerHTML=`<div class="lih" onclick="toggleLieu(this.parentElement)">
+        <span class="le">${lieu.emoji}</span>
+        <div class="lin"><div class="lname">${lieu.name}</div><div class="ltype">${lieu.type} · ${lieu.infos}</div></div>
+        <span class="larr">›</span>
+      </div>
+      <div class="lib">
+        <div class="ldesc">${lieu.desc}</div>
+        <div class="lmeta"><span class="lmc">📍 ${lieu.etape}</span><span class="lmc">🏷️ ${lieu.type}</span></div>
+        <a class="lb" href="${lieu.maps}" target="_blank">🗺️ Ouvrir dans Maps</a>
+        ${lieu.gps?`<div style="font-size:11px;color:var(--text3);margin-top:6px">GPS : ${lieu.gps}</div>`:''}
+      </div>`;
+      s.appendChild(el);
+    });
+    c.appendChild(s);
+  });
+}
+
+function toggleLieu(el){el.classList.toggle('open');}
+function convertZAR(){const v=parseFloat(document.getElementById('zar-input').value)||0;document.getElementById('eur-result').textContent='= '+(v/20).toFixed(2)+' €';}
+function convertEUR(){const v=parseFloat(document.getElementById('eur-input').value)||0;document.getElementById('zar-result').textContent='= '+(v*20).toFixed(0)+' ZAR';}
+
+window.onload=init;
+
+</script>
+</body>
+</html>
